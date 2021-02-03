@@ -1,0 +1,10 @@
+{
+  "name": "auto-graphql-server",
+  "version": "0.1.0",
+  "description": "Automaticly generating server component from Graphql schema",
+  "main": "index.js",
+  "repository": "https://github.com/voidpumpkin/auto-graphql-server.git",
+  "author": "Julius Lungys <32368314+voidpumpkin@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {}
+}
