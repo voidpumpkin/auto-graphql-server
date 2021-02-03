@@ -1,10 +1,10 @@
-import Koa from "koa";
+import Koa from 'koa';
 const app = new Koa();
 
 app.use(async (ctx) => {
-  ctx.body = "Hello World";
+    ctx.body = 'Hello World';
 });
 
-let PORT = 3000;
+const PORT = 3000;
 console.log(`Listening at http://localhost:${PORT}`);
 app.listen(PORT);
