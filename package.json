@@ -3,28 +3,30 @@
     "version": "0.1.0",
     "description": "Automaticly generating server component from Graphql schema",
     "main": "index.js",
-    "type": "module",
     "repository": "https://github.com/voidpumpkin/auto-graphql-server.git",
     "author": "Julius Lungys <32368314+voidpumpkin@users.noreply.github.com>",
     "license": "MIT",
     "scripts": {
+        "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "lint": "eslint src --ext .js,.ts --quiet --fix",
-        "dev": "concurrently \"tsc --watch\" \"nodemon dist --inspect=3000\"",
+        "dev": "ts-node-dev src/index.ts",
         "build": "rm -rf dist && tsc",
-        "start": "node dist"
+        "start": "ts-node src/index.ts"
     },
     "dependencies": {
         "@types/koa": "^2.11.7",
         "@types/node": "^14.14.22",
         "@typescript-eslint/eslint-plugin": "^4.14.2",
         "@typescript-eslint/parser": "^4.14.2",
-        "concurrently": "^5.3.0",
+        "koa": "^2.13.1",
+        "ts-node": "^9.1.1",
+        "typescript": "^4.1.3"
+    },
+    "devDependencies": {
         "eslint": "^7.19.0",
         "eslint-config-prettier": "^7.2.0",
         "eslint-plugin-prettier": "^3.3.1",
-        "koa": "^2.13.1",
-        "nodemon": "^2.0.7",
-        "prettier": "^2.2.1",
-        "typescript": "^4.1.3"
+        "ts-node-dev": "^1.1.1",
+        "prettier": "^2.2.1"
     }
 }
