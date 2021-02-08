@@ -1834,6 +1834,11 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
+json-hash@^1.1.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/json-hash/-/json-hash-1.2.0.tgz#b3e717cb077602da75f4817d3a3cc449397f9b10"
+  integrity sha1-s+cXywd2Atp19IF9OjzESTl/mxA=
+
 json-schema-traverse@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz#69f6a87d9513ab8bb8fe63bdb0979c448e684660"
@@ -2759,6 +2764,13 @@ run-parallel@^1.1.9:
   version "1.1.10"
   resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.1.10.tgz#60a51b2ae836636c81377df16cb107351bcd13ef"
   integrity sha512-zb/1OuZ6flOlH6tQyMPUrE3x3Ulxjlo9WIVXR4yVYi4H9UXQaeIsPbLn2R3O3vQCnDKkAl2qHiuocKKX4Tz/Sw==
+
+rus-diff@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/rus-diff/-/rus-diff-1.1.0.tgz#03d8905cf63ce07c2ad72bd357c9ff422ba0727d"
+  integrity sha1-A9iQXPY84Hwq1yvTV8n/Qiugcn0=
+  dependencies:
+    json-hash "^1.1.0"
 
 safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"

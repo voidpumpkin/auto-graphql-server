@@ -9,9 +9,9 @@
     "scripts": {
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "lint": "eslint src --ext .js,.ts --quiet --fix",
-        "dev": "ts-node-dev src/index.ts",
+        "dev": "ts-node-dev src",
         "build": "rm -rf dist && tsc",
-        "start": "ts-node src/index.ts"
+        "start": "ts-node src"
     },
     "dependencies": {
         "@types/koa": "^2.11.7",
@@ -20,6 +20,7 @@
         "@typescript-eslint/parser": "^4.14.2",
         "knex": "^0.21.17",
         "koa": "^2.13.1",
+        "rus-diff": "^1.1.0",
         "sqlite3": "5.0.0",
         "ts-node": "^9.1.1",
         "typescript": "^4.1.3"

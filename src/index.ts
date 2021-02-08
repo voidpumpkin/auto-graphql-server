@@ -1,5 +1,29 @@
 import Koa from 'koa';
-import Knex from 'knex';
+import Knex, { CreateTableBuilder } from 'knex';
+import { diff } from 'rus-diff';
+
+type BuilderMethod = keyof CreateTableBuilder;
+type Table = Record<string, BuilderMethod[]>;
+type Schema = Record<string, Table>;
+
+const OLD_SCHEMA: Schema = {
+    users: {
+        id: ['increments'],
+        firstname: ['string'],
+        lastname: ['string'],
+        age: ['integer'],
+    },
+};
+const NEW_SCHEMA: Schema = {
+    users: {
+        id: ['increments'],
+        firstname: ['string'],
+        lastname: ['string'],
+        middlename: ['string'],
+        age: ['integer'],
+    },
+};
+console.log('Proof of concept for schema diff', diff(OLD_SCHEMA, NEW_SCHEMA));
 
 const app = new Koa();
 const knex = Knex({
@@ -11,16 +35,6 @@ const knex = Knex({
 });
 
 (async () => {
-    const copyTable = async (from: string, to: string): Promise<void> => {
-        const ids = await knex(from).select('id');
-        await Promise.all(
-            ids.map(async ({ id }) => {
-                const entry = await knex(from).select().where('id', id);
-                await knex(to).insert(entry);
-            })
-        );
-    };
-
     if (!(await knex.schema.hasTable('users'))) {
         await knex.schema.createTable('users', (tableBuilder) => {
             tableBuilder.increments();
@@ -34,24 +48,6 @@ const knex = Knex({
             { firstname: 'al', lastname: 'rogers', age: 40 },
             { firstname: 'smit', lastname: 'chocolate', age: 60 },
         ]);
-    } else {
-        await knex.schema.createTable('TEMP_NAME_ID_users', (tableBuilder) => {
-            tableBuilder.increments();
-            tableBuilder.string('firstname');
-            tableBuilder.string('lastname');
-            tableBuilder.integer('age');
-        });
-        await copyTable('users', 'TEMP_NAME_ID_users');
-        await knex.schema.dropTable('users');
-        await knex.schema.createTable('users', (tableBuilder) => {
-            tableBuilder.increments();
-            tableBuilder.string('firstname');
-            tableBuilder.string('lastname');
-            tableBuilder.string('middlename');
-            tableBuilder.integer('age');
-        });
-        await copyTable('TEMP_NAME_ID_users', 'users');
-        await knex.schema.dropTable('TEMP_NAME_ID_users');
     }
 })();
 
