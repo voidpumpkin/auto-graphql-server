@@ -2,38 +2,13 @@ import Koa from 'koa';
 import mount from 'koa-mount';
 import fs from 'fs';
 import path from 'path';
-import Knex, { CreateTableBuilder } from 'knex';
-import { diff } from 'rus-diff';
+import Knex from 'knex';
 import { isScalarType, isObjectType } from 'graphql';
 import graphqlHTTP from 'koa-graphql';
 import { makeExecutableSchema, addResolversToSchema } from '@graphql-tools/schema';
 import { IResolvers } from '@graphql-tools/utils';
 
-type BuilderMethod = keyof CreateTableBuilder;
-type Table = Record<string, BuilderMethod[]>;
-type Schema = Record<string, Table>;
-
 const PORT = 3000;
-// const GRAPHQL_SCALARS = [];
-// type StandartGraphqlScalar = 'Int' is const | 'Float' | 'String' | 'Boolean' | 'ID';
-const OLD_SCHEMA: Schema = {
-    users: {
-        id: ['increments'],
-        firstname: ['string'],
-        lastname: ['string'],
-        age: ['integer'],
-    },
-};
-const NEW_SCHEMA: Schema = {
-    users: {
-        id: ['increments'],
-        firstname: ['string'],
-        lastname: ['string'],
-        middlename: ['string'],
-        age: ['integer'],
-    },
-};
-console.log('Proof of concept for schema diff', diff(OLD_SCHEMA, NEW_SCHEMA));
 
 const main = async () => {
     const knex = Knex({

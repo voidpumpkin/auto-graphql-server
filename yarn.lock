@@ -3034,11 +3034,6 @@ jsesc@^2.5.1:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-2.5.2.tgz"
   integrity sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==
 
-json-hash@^1.1.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/json-hash/-/json-hash-1.2.0.tgz"
-  integrity sha1-s+cXywd2Atp19IF9OjzESTl/mxA=
-
 json-schema-traverse@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz"
@@ -4215,13 +4210,6 @@ run-parallel@^1.1.9:
   version "1.1.10"
   resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.1.10.tgz"
   integrity sha512-zb/1OuZ6flOlH6tQyMPUrE3x3Ulxjlo9WIVXR4yVYi4H9UXQaeIsPbLn2R3O3vQCnDKkAl2qHiuocKKX4Tz/Sw==
-
-rus-diff@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/rus-diff/-/rus-diff-1.1.0.tgz"
-  integrity sha1-A9iQXPY84Hwq1yvTV8n/Qiugcn0=
-  dependencies:
-    json-hash "^1.1.0"
 
 safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
