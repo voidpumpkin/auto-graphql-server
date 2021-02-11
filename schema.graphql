@@ -1,0 +1,14 @@
+### database_type: sqlite
+schema {
+    query: Query
+}
+
+type Query {
+    book: book
+    name: String
+    # numbers: [Int]
+}
+
+type book {
+    name: String
+}
