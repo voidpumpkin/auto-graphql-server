@@ -7,6 +7,7 @@
     "author": "Julius Lungys <32368314+voidpumpkin@users.noreply.github.com>",
     "license": "MIT",
     "scripts": {
+        "test": "mocha --recursive src/ --extension test.ts --require ts-node/register --exit",
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "lint": "eslint src --ext .js,.ts --quiet --fix",
         "dev": "ts-node-dev src",
@@ -18,8 +19,6 @@
         "@types/koa-graphql": "^0.8.4",
         "@types/koa-mount": "^4.0.0",
         "@types/node": "^14.14.22",
-        "@typescript-eslint/eslint-plugin": "^4.14.2",
-        "@typescript-eslint/parser": "^4.14.2",
         "graphql": "^15.5.0",
         "graphql-directive": "^0.2.1",
         "graphql-tools": "^7.0.3",
@@ -32,10 +31,18 @@
         "typescript": "^4.1.3"
     },
     "devDependencies": {
+        "@types/chai": "^4.2.15",
+        "@types/mocha": "^8.2.2",
+        "@types/supertest": "^2.0.10",
+        "@typescript-eslint/eslint-plugin": "^4.14.2",
+        "@typescript-eslint/parser": "^4.14.2",
+        "chai": "^4.3.4",
         "eslint": "^7.19.0",
         "eslint-config-prettier": "^7.2.0",
         "eslint-plugin-prettier": "^3.3.1",
+        "mocha": "^8.3.2",
         "prettier": "^2.2.1",
+        "supertest": "^6.1.3",
         "ts-node-dev": "^1.1.1"
     }
 }

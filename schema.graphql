@@ -6,9 +6,14 @@ schema {
 type Query {
     book: book
     name: String
+    bob: bob
     # numbers: [Int]
 }
 
 type book {
+    name: String
+}
+
+type bob {
     name: String
 }
