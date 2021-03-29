@@ -10,7 +10,7 @@ import { IResolvers } from '@graphql-tools/utils';
 
 const PORT = 3000;
 
-const main = async () => {
+const main = async (graphiql = true): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
     const knex = Knex({
         client: 'sqlite3',
         connection: {
@@ -72,10 +72,28 @@ const main = async () => {
 
     const app = new Koa();
 
-    app.use(mount('/graphql', graphqlHTTP({ schema: schemaWithResolvers, graphiql: true })));
+    app.use(
+        mount(
+            '/',
+            graphqlHTTP({
+                schema: schemaWithResolvers,
+                graphiql,
+            })
+        )
+    );
 
-    console.log(`Listening at http://localhost:${PORT}`);
-    app.listen(PORT);
+    // this module was run directly from the command line
+    if (require.main === module) {
+        console.log(`Listening at http://localhost:${PORT}`);
+        app.listen(PORT);
+    }
+
+    return app;
 };
 
-main();
+// this module was run directly from the command line
+if (require.main === module) {
+    main();
+}
+
+export default main;
