@@ -1,0 +1,12 @@
+{
+    "graphqlHTTP": {
+        "graphiql": false
+    },
+    "database": {
+        "client": "sqlite",
+        "connection": {
+            "filename": ":memory:"
+        },
+        "useNullAsDefault": true
+    }
+}

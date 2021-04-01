@@ -7,7 +7,7 @@
     "author": "Julius Lungys <32368314+voidpumpkin@users.noreply.github.com>",
     "license": "MIT",
     "scripts": {
-        "test": "mocha --recursive src/ --extension test.ts --require ts-node/register --exit",
+        "test": "mocha --recursive tests/ --extension test.ts --require ts-node/register --exit",
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "lint": "eslint src --ext .js,.ts --quiet --fix",
         "dev": "ts-node-dev src",

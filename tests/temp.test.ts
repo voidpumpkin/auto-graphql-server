@@ -1,12 +1,18 @@
 import request from 'supertest';
 import { assert } from 'chai';
 
-import main from '../index';
+import createApp from '../src/createApp';
+import getSourceSchema from '../src/getSourceSchema';
 
-describe('main()', async () => {
+import config from './testConfig.json';
+
+describe('Temp', async () => {
     it('should run simple graphql request', async () => {
         try {
-            const response = await request((await main(false)).listen())
+            const sourceSchema = getSourceSchema({
+                typeDefs: `schema { query: Query } type Query { book: book } type book { name: String }`,
+            });
+            const response = await request((await createApp(config, sourceSchema)).listen())
                 .post(`/`)
                 .set('Accept', 'application/json')
                 .send({ query: '{book{name}}' });
