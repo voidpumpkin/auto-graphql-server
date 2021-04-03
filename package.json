@@ -9,6 +9,7 @@
     "scripts": {
         "test": "mocha --recursive tests/ --extension test.ts --require ts-node/register --exit",
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
+        "clean": "rm test.sqlite3",
         "lint": "eslint src --ext .js,.ts --quiet --fix",
         "dev": "ts-node-dev src",
         "build": "rm -rf dist && tsc",

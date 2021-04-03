@@ -29,23 +29,6 @@ const getAutoResolvers = async (sourceSchema: GraphQLSchema, knex: Knex): Promis
                 autoResolvers[name][fieldName] = async () =>
                     await knex.select('*').table(fieldTypeName).first();
             });
-            //fields
-            const scalarFieldNames = Object.entries(namedType.getFields())
-                .filter(([, val]) => isScalarType(val.type))
-                .map(([key]) => key);
-            if (!scalarFieldNames.length) {
-                return;
-            }
-            //create table
-            if (await knex.schema.hasTable(name)) {
-                return;
-            }
-            await knex.schema.createTable(name, (tableBuilder) => {
-                scalarFieldNames.forEach((fieldName) => tableBuilder['string'](fieldName));
-            });
-            //mock data
-            const insertable = scalarFieldNames.map((fieldName) => ({ [fieldName]: 'bob' }));
-            await knex(name).insert(insertable);
         })
     );
     return autoResolvers;

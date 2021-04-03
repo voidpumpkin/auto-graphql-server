@@ -6,6 +6,7 @@ import { addResolversToSchema } from '@graphql-tools/schema';
 
 import getSourceSchema from './getSourceSchema';
 import getAutoResolvers from './getAutoResolvers';
+import generateTables from './generateTables';
 
 import type { GraphQLSchema } from 'graphql';
 
@@ -34,6 +35,13 @@ const createApp = async (
         sourceSchema = sourceSchema || getSourceSchema({ schemaPath: config.schemaPath });
     } catch (e) {
         console.error('Your schema has errors: ');
+        throw e;
+    }
+
+    try {
+        await generateTables(sourceSchema, knex);
+    } catch (e) {
+        console.error('Error happened while generating tables: ');
         throw e;
     }
 
