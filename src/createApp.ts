@@ -28,8 +28,20 @@ const createApp = async (
     }
     const knex = Knex(config.database);
 
-    sourceSchema = sourceSchema || getSourceSchema({ schemaPath: config.schemaPath });
-    const autoResolvers = await getAutoResolvers(sourceSchema, knex);
+    try {
+        sourceSchema = sourceSchema || getSourceSchema({ schemaPath: config.schemaPath });
+    } catch (e) {
+        console.error('Your schema has errors: ');
+        throw e;
+    }
+
+    let autoResolvers;
+    try {
+        autoResolvers = await getAutoResolvers(sourceSchema, knex);
+    } catch (e) {
+        console.error('Error happened while generating resolvers: ');
+        throw e;
+    }
 
     const schema = addResolversToSchema({
         schema: sourceSchema,
