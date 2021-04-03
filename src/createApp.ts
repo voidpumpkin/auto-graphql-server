@@ -18,7 +18,8 @@ type Config = {
 
 const createApp = async (
     config: Config | undefined,
-    sourceSchema?: GraphQLSchema
+    sourceSchema?: GraphQLSchema,
+    knex?: Knex
 ): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
     if (!config) {
         throw new Error('missing config');
@@ -26,7 +27,8 @@ const createApp = async (
     if (!config?.database || typeof config.database !== 'object') {
         throw new Error('config database field is incorrect or missing');
     }
-    const knex = Knex(config.database);
+
+    knex = knex || Knex(config.database);
 
     try {
         sourceSchema = sourceSchema || getSourceSchema({ schemaPath: config.schemaPath });
