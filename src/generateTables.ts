@@ -30,6 +30,7 @@ const generateTables = async (sourceSchema: GraphQLSchema, knex: Knex): Promise<
                 return;
             }
             await knex.schema.createTable(objectTypeName, (tableBuilder) => {
+                tableBuilder.increments('id');
                 scalarFieldTyples.forEach(([fieldName, fieldType]) =>
                     tableBuilder[getKnexColumnType(fieldType)](fieldName)
                 );

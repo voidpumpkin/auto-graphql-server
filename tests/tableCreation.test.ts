@@ -23,6 +23,9 @@ describe('Feature: Database table creation', async () => {
             it('Expect tables of types with scalars have columns', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
             });
+            it('Expect tables of types with scalars have id column', async () => {
+                expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+            });
             it('Expect columns to match scalar type', async () => {
                 expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
             });
@@ -42,6 +45,9 @@ describe('Feature: Database table creation', async () => {
             it('Expect tables of types with scalars have columns', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
                 expect(await knex.schema.hasColumn('Query', 'iteration')).to.be.true;
+            });
+            it('Expect tables of types with scalars have id column', async () => {
+                expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
             });
             it('Expect columns to match scalar type', async () => {
                 expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
@@ -70,6 +76,9 @@ describe('Feature: Database table creation', async () => {
                     expect(await knex.schema.hasColumn('Book', 'name')).to.be.true;
                     expect(await knex.schema.hasColumn('Book', 'iteration')).to.be.true;
                 });
+                it('Expect tables of types with scalars have id column', async () => {
+                    expect(await knex.schema.hasColumn('Book', 'id')).to.be.true;
+                });
                 it('Expect columns to match scalar type', async () => {
                     expect((await knex('Book').columnInfo('name')).type).to.be.string('varchar');
                     expect((await knex('Book').columnInfo('iteration')).type).to.be.string(
@@ -94,6 +103,10 @@ describe('Feature: Database table creation', async () => {
                     expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
                     expect(await knex.schema.hasColumn('Book', 'name')).to.be.true;
                     expect(await knex.schema.hasColumn('Book', 'iteration')).to.be.true;
+                });
+                it('Expect tables of types with scalars have id column', async () => {
+                    expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+                    expect(await knex.schema.hasColumn('Book', 'id')).to.be.true;
                 });
                 it('Expect columns to match scalar type', async () => {
                     expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
