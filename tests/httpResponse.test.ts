@@ -1,8 +1,8 @@
 import request from 'supertest';
 import { assert } from 'chai';
 
-import createApp from '../src/createApp';
-import getSourceSchema from '../src/getSourceSchema';
+import { createApp } from '../src/createApp';
+import { getSourceSchema } from '../src/getSourceSchema';
 
 import config from './testConfig.json';
 
@@ -11,7 +11,7 @@ describe.skip('Http Responses', async () => {
         const sourceSchema = getSourceSchema({
             typeDefs: `schema { query: Query } type Query { book: book } type book { name: String }`,
         });
-        const response = await request((await createApp(config, sourceSchema)).listen())
+        const response = await request((await createApp({ config, sourceSchema })).listen())
             .post(`/`)
             .set('Accept', 'application/json')
             .send({ query: '{book{name}}' });

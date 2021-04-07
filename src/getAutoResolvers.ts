@@ -4,7 +4,13 @@ import type Knex from 'knex';
 import type { IResolvers } from '@graphql-tools/utils';
 import type { GraphQLSchema } from 'graphql';
 
-const getAutoResolvers = async (sourceSchema: GraphQLSchema, knex: Knex): Promise<IResolvers> => {
+export async function getAutoResolvers({
+    sourceSchema,
+    knex,
+}: {
+    sourceSchema: GraphQLSchema;
+    knex: Knex;
+}): Promise<IResolvers> {
     const autoResolvers: IResolvers = {};
     const schemaTypeMap = sourceSchema.getTypeMap();
     const namedTypesNames = Object.entries(schemaTypeMap)
@@ -32,5 +38,4 @@ const getAutoResolvers = async (sourceSchema: GraphQLSchema, knex: Knex): Promis
         })
     );
     return autoResolvers;
-};
-export default getAutoResolvers;
+}

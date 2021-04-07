@@ -4,13 +4,13 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 
 import type { GraphQLSchema } from 'graphql';
 
-const getSourceSchema = ({
+export function getSourceSchema({
     schemaPath,
     typeDefs,
 }: {
     schemaPath?: string;
     typeDefs?: string;
-}): GraphQLSchema => {
+}): GraphQLSchema {
     if (!typeDefs) {
         if (!schemaPath) {
             throw new Error('TypeDefs or SchemaPath required');
@@ -21,6 +21,4 @@ const getSourceSchema = ({
 
     const schema = makeExecutableSchema({ typeDefs });
     return schema;
-};
-
-export default getSourceSchema;
+}

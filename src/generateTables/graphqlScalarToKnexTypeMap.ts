@@ -3,7 +3,6 @@ import {
     GRAPHQL_FLOAT,
     GRAPHQL_STRING,
     GRAPHQL_BOOL,
-    GRAPHQL_ID,
     KnexColumnType,
     KNEX_BOOL,
     KNEX_FLOAT,
@@ -18,7 +17,7 @@ export const graphqlScalarToKnexTypeMap = {
     [GRAPHQL_BOOL]: KNEX_BOOL,
 };
 
-export const getKnexColumnType = (graphqlType: string): KnexColumnType => {
+export function getKnexColumnType(graphqlType: string): KnexColumnType {
     if (
         graphqlType !== GRAPHQL_INT &&
         graphqlType !== GRAPHQL_FLOAT &&
@@ -28,6 +27,4 @@ export const getKnexColumnType = (graphqlType: string): KnexColumnType => {
         return KNEX_STRING;
     }
     return graphqlScalarToKnexTypeMap[graphqlType];
-};
-
-export default graphqlScalarToKnexTypeMap;
+}

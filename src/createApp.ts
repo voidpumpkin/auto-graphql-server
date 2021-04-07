@@ -4,9 +4,9 @@ import mount from 'koa-mount';
 import graphqlHTTP from 'koa-graphql';
 import { addResolversToSchema } from '@graphql-tools/schema';
 
-import getSourceSchema from './getSourceSchema';
-import getAutoResolvers from './getAutoResolvers';
-import generateTables from './generateTables';
+import { getSourceSchema } from './getSourceSchema';
+import { getAutoResolvers } from './getAutoResolvers';
+import { generateTables } from './generateTables/generateTables';
 
 import type { GraphQLSchema } from 'graphql';
 
@@ -17,11 +17,15 @@ type Config = {
     database?: Knex.Config;
 };
 
-const createApp = async (
-    config: Config | undefined,
-    sourceSchema?: GraphQLSchema,
-    knex?: Knex
-): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
+export async function createApp({
+    config,
+    sourceSchema,
+    knex,
+}: {
+    config: Config | undefined;
+    sourceSchema?: GraphQLSchema;
+    knex?: Knex;
+}): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
     if (!config) {
         throw new Error('missing config');
     }
@@ -39,7 +43,7 @@ const createApp = async (
     }
 
     try {
-        await generateTables(sourceSchema, knex);
+        await generateTables({ sourceSchema, knex });
     } catch (e) {
         console.error('Error happened while generating tables: ');
         throw e;
@@ -47,7 +51,7 @@ const createApp = async (
 
     let autoResolvers;
     try {
-        autoResolvers = await getAutoResolvers(sourceSchema, knex);
+        autoResolvers = await getAutoResolvers({ sourceSchema, knex });
     } catch (e) {
         console.error('Error happened while generating resolvers: ');
         throw e;
@@ -63,5 +67,4 @@ const createApp = async (
     app.use(mount('/', graphqlHTTP({ schema, ...config.graphqlHTTP })));
 
     return app;
-};
-export default createApp;
+}
