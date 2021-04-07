@@ -10,15 +10,23 @@ export async function applyTableConstraints({
     objectTypeNames: string[];
     schemaTypeMap: TypeMap;
     knex: Knex;
-}) {
+}): Promise<void> {
     await Promise.all(
         objectTypeNames.map(async (objectTypeName) => {
             const objectType = schemaTypeMap[objectTypeName];
             if (!isObjectType(objectType)) {
                 throw new Error('Not object type');
             }
+
+            const directFieldEntries = Object.entries(objectType.getFields());
+            const interfacesFieldEntries = objectType
+                .getInterfaces()
+                .map((i) => Object.entries(i.getFields()))
+                .flat();
+            const fieldEntries = [...directFieldEntries, ...interfacesFieldEntries];
+
             const objectFieldTypes: [string, string][] = [];
-            for (const [key, val] of Object.entries(objectType.getFields())) {
+            for (const [key, val] of fieldEntries) {
                 if (isObjectType(val.type)) {
                     objectFieldTypes.push([key, val.type.name]);
                 }

@@ -5,6 +5,7 @@ import { TypeMap } from '@graphql-tools/utils';
 import { buildObjectFieldTables } from './buildObjectFieldTables';
 import { buildScalarFieldTables } from './buildScalarFieldTables';
 import { buildListFields } from './buildListFields';
+import { recursivelyGetAllFieldTypeEntries } from './AllFieldTypeEntries';
 
 export async function generateColumns({
     objectTypeNames,
@@ -25,11 +26,14 @@ export async function generateColumns({
             if (!isObjectType(objectType)) {
                 throw new Error('Not object type');
             }
+
+            const fieldTypeEntries = recursivelyGetAllFieldTypeEntries(objectType);
+
             const scalarFieldTypeNameMap: Record<string, string> = {};
             const objectFieldNames: string[] = [];
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const listFieldTypeMap: Record<string, GraphQLList<any>> = {};
-            for (const [key, { type }] of Object.entries(objectType.getFields())) {
+            for (const [key, type] of fieldTypeEntries) {
                 if (isScalarType(type)) {
                     scalarFieldTypeNameMap[key] = type.name;
                 } else if (isObjectType(type)) {

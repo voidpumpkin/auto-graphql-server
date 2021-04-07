@@ -24,7 +24,8 @@ export async function getAutoResolvers({
             //resolver
             const namedType = schemaTypeMap[name];
             if (!isObjectType(namedType)) {
-                throw new Error('Not object type');
+                return autoResolvers;
+                // throw new Error('Not object type');
             }
             const fields = Object.entries(namedType.getFields())
                 .filter(([, fieldType]) => !isScalarType(fieldType.type))

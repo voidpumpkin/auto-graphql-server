@@ -324,5 +324,191 @@ describe('Feature: Database table creation', async () => {
                 });
             });
         });
+        describe('And implements Face', async () => {
+            describe('And that interface has one scalar', async () => {
+                let knex: Knex;
+                before(async () => {
+                    const sourceSchema = getSourceSchema({
+                        typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { score: Int }`,
+                    });
+                    knex = Knex(config.database);
+                    await createApp({ config, sourceSchema, knex });
+                });
+                it('Expect tables to exist', async () => {
+                    expect(await knex.schema.hasTable('Query')).to.be.true;
+                });
+                it('Expect tables to have columns', async () => {
+                    expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'score')).to.be.true;
+                });
+                it('Expect columns to have correct types', async () => {
+                    expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                    expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
+                });
+            });
+            describe('And that type has one scalar list', async () => {
+                let knex: Knex;
+                before(async () => {
+                    const sourceSchema = getSourceSchema({
+                        typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { scores: [Int] }`,
+                    });
+                    knex = Knex(config.database);
+                    await createApp({ config, sourceSchema, knex });
+                });
+                it('Expect tables of types with scalar lists to exist', async () => {
+                    expect(await knex.schema.hasTable('Query')).to.be.true;
+                });
+                it('Expect tables of types with scalars have primary key id column', async () => {
+                    expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+                });
+                it('Expect tables of scalar lists to exist', async () => {
+                    expect(await knex.schema.hasTable('__Query_scores_list')).to.be.true;
+                });
+                it('Expect tables of scalar lists to have columns', async () => {
+                    expect(await knex.schema.hasColumn('__Query_scores_list', 'id')).to.be.true;
+                    expect(await knex.schema.hasColumn('__Query_scores_list', 'value')).to.be.true;
+                    expect(await knex.schema.hasColumn('__Query_scores_list', '__Query_id')).to.be
+                        .true;
+                });
+                it('Expect columns to match lists scalar types', async () => {
+                    expect((await knex('__Query_scores_list').columnInfo('id')).type).to.be.string(
+                        'integer'
+                    );
+                    expect(
+                        (await knex('__Query_scores_list').columnInfo('value')).type
+                    ).to.be.string('integer');
+                    expect(
+                        (await knex('__Query_scores_list').columnInfo('__Query_id')).type
+                    ).to.be.string('integer');
+                });
+            });
+            describe('And that type has Book list', async () => {
+                describe('And Book has one scalar field', async () => {
+                    let knex: Knex;
+                    before(async () => {
+                        const sourceSchema = getSourceSchema({
+                            typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { books: [Book] } type Book { name: String }`,
+                        });
+                        knex = Knex(config.database);
+                        await createApp({ config, sourceSchema, knex });
+                    });
+                    it('Expect tables to exist', async () => {
+                        expect(await knex.schema.hasTable('Query')).to.be.true;
+                        expect(await knex.schema.hasTable('Book')).to.be.true;
+                    });
+                    it('Expect tables to have primary key id column', async () => {
+                        expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+                        expect(await knex.schema.hasColumn('Book', 'id')).to.be.true;
+                    });
+                    it('Expect tables of object lists to have columns', async () => {
+                        expect(await knex.schema.hasColumn('Book', 'name')).to.be.true;
+                        expect(await knex.schema.hasColumn('Book', '__Query_id')).to.be.true;
+                    });
+                    it('Expect columns of object lists to have correct types', async () => {
+                        expect((await knex('Book').columnInfo('id')).type).to.be.string('integer');
+                        expect((await knex('Book').columnInfo('__Query_id')).type).to.be.string(
+                            'integer'
+                        );
+                    });
+                });
+            });
+            describe('And implements Body', async () => {
+                describe('And those interfaces have one scalar', async () => {
+                    let knex: Knex;
+                    before(async () => {
+                        const sourceSchema = getSourceSchema({
+                            typeDefs: `schema { query: Query } type Query implements Face & Body { name: String } interface Face { score: Int } interface Body { hasLimbs: Boolean }`,
+                        });
+                        knex = Knex(config.database);
+                        await createApp({ config, sourceSchema, knex });
+                    });
+                    it('Expect tables to exist', async () => {
+                        expect(await knex.schema.hasTable('Query')).to.be.true;
+                    });
+                    it('Expect tables to have columns', async () => {
+                        expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
+                        expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+                        expect(await knex.schema.hasColumn('Query', 'score')).to.be.true;
+                        expect(await knex.schema.hasColumn('Query', 'hasLimbs')).to.be.true;
+                    });
+                    it('Expect columns to have correct types', async () => {
+                        expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                        expect((await knex('Query').columnInfo('name')).type).to.be.string(
+                            'varchar'
+                        );
+                        expect((await knex('Query').columnInfo('score')).type).to.be.string(
+                            'integer'
+                        );
+                        expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.string(
+                            'boolean'
+                        );
+                    });
+                });
+            });
+        });
+        describe('And implements Face that implements Circle', async () => {
+            describe('And those interfaces have one scalar', async () => {
+                let knex: Knex;
+                before(async () => {
+                    const sourceSchema = getSourceSchema({
+                        typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle { hasLimbs: Boolean }`,
+                    });
+                    knex = Knex(config.database);
+                    await createApp({ config, sourceSchema, knex });
+                });
+                it('Expect tables to exist', async () => {
+                    expect(await knex.schema.hasTable('Query')).to.be.true;
+                });
+                it('Expect tables to have columns', async () => {
+                    expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'score')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'hasLimbs')).to.be.true;
+                });
+                it('Expect columns to have correct types', async () => {
+                    expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                    expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.string(
+                        'boolean'
+                    );
+                });
+            });
+        });
+        describe('And implements Face that implements Circle that implements Figure', async () => {
+            describe('And those interfaces have one scalar', async () => {
+                let knex: Knex;
+                before(async () => {
+                    const sourceSchema = getSourceSchema({
+                        typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle implements Figure { hasLimbs: Boolean } interface Figure { figureType: String }`,
+                    });
+                    knex = Knex(config.database);
+                    await createApp({ config, sourceSchema, knex });
+                });
+                it('Expect tables to exist', async () => {
+                    expect(await knex.schema.hasTable('Query')).to.be.true;
+                });
+                it('Expect tables to have columns', async () => {
+                    expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'score')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'hasLimbs')).to.be.true;
+                    expect(await knex.schema.hasColumn('Query', 'figureType')).to.be.true;
+                });
+                it('Expect columns to have correct types', async () => {
+                    expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                    expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.string(
+                        'boolean'
+                    );
+                    expect((await knex('Query').columnInfo('figureType')).type).to.be.string(
+                        'varchar'
+                    );
+                });
+            });
+        });
     });
 });
