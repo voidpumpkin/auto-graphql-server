@@ -29,6 +29,10 @@ export async function generateColumns({
 
             const fieldTypeEntries = recursivelyGetAllFieldTypeEntries(objectType);
 
+            if (fieldTypeEntries.some(([key]) => key === 'id')) {
+                throw new Error('Id field customization not implemented');
+            }
+
             const scalarFieldTypeNameMap: Record<string, string> = {};
             const objectFieldNames: string[] = [];
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
