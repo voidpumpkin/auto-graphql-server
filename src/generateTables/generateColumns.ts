@@ -5,7 +5,7 @@ import { TypeMap } from '@graphql-tools/utils';
 import { buildObjectFieldTables } from './buildObjectFieldTables';
 import { buildScalarFieldTables } from './buildScalarFieldTables';
 import { buildListFields } from './buildListFields';
-import { recursivelyGetAllFieldTypeEntries } from './AllFieldTypeEntries';
+import { recursivelyGetAllFieldTypeEntries } from './recursivelyGetAllFieldTypeEntries';
 
 export async function generateColumns({
     objectTypeNames,
