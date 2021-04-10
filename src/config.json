@@ -4,6 +4,7 @@
     "graphqlHTTP": {
         "graphiql": true
     },
+    "printSql": true,
     "database": {
         "client": "sqlite",
         "connection": {

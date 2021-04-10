@@ -13,6 +13,7 @@ import type { GraphQLSchema } from 'graphql';
 type Config = {
     port?: number;
     schemaPath?: string;
+    printSql?: boolean;
     graphqlHTTP?: Omit<graphqlHTTP.Options, 'schema'>;
     database?: Knex.Config;
 };
@@ -34,6 +35,11 @@ export async function createApp({
     }
 
     knex = knex || Knex(config.database);
+    if (config.printSql) {
+        knex.on('query', function (queryData) {
+            console.log(`[🐿]\x1b[36m${queryData.sql}\x1b[0m`);
+        });
+    }
 
     try {
         sourceSchema = sourceSchema || getSourceSchema({ schemaPath: config.schemaPath });

@@ -1,4 +1,4 @@
-import { isScalarType, isObjectType } from 'graphql';
+import { isScalarType, isObjectType, isInterfaceType } from 'graphql';
 
 import type Knex from 'knex';
 import type { IResolvers } from '@graphql-tools/utils';
@@ -14,7 +14,9 @@ export async function getAutoResolvers({
     const autoResolvers: IResolvers = {};
     const schemaTypeMap = sourceSchema.getTypeMap();
     const namedTypesNames = Object.entries(schemaTypeMap)
-        .filter(([key, val]) => !isScalarType(val) && key.substr(0, 2) !== '__')
+        .filter(
+            ([key, val]) => !isInterfaceType(val) && !isScalarType(val) && key.substr(0, 2) !== '__'
+        )
         .map(([key]) => key);
 
     await Promise.all(
@@ -24,17 +26,24 @@ export async function getAutoResolvers({
             //resolver
             const namedType = schemaTypeMap[name];
             if (!isObjectType(namedType)) {
-                return autoResolvers;
-                // throw new Error('Not object type');
+                throw new Error('Not object type');
             }
-            const fields = Object.entries(namedType.getFields())
-                .filter(([, fieldType]) => !isScalarType(fieldType.type))
-                .map(([fieldName, fieldType]) => [fieldName, fieldType.name]);
-            fields.forEach(([fieldName, fieldTypeName]) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                //@ts-ignore
-                autoResolvers[name][fieldName] = async () =>
-                    await knex.select('*').table(fieldTypeName).first();
+            Object.entries(namedType.getFields()).forEach(([fieldName, fieldType]) => {
+                const fieldTypeType = fieldType.type;
+                if (isScalarType(fieldTypeType)) {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    //@ts-ignore
+                    autoResolvers[name][fieldName] = async (root, _, __, info) => {
+                        if (root?.hasOwnProperty(info.fieldName)) {
+                            return root[info.fieldName];
+                        }
+                        const result = await knex
+                            .select(info.fieldName)
+                            .table(info.parentType.name)
+                            .first();
+                        return result[info.fieldName];
+                    };
+                }
             });
         })
     );
