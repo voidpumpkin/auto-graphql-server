@@ -7,6 +7,7 @@ import { addResolversToSchema } from '@graphql-tools/schema';
 import { getSourceSchema } from './getSourceSchema';
 import { getAutoResolvers } from './getAutoResolvers';
 import { generateTables } from './generateTables/generateTables';
+import { log } from './logger';
 
 import type { GraphQLSchema } from 'graphql';
 
@@ -37,7 +38,7 @@ export async function createApp({
     knex = knex || Knex(config.database);
     if (config.printSql) {
         knex.on('query', function (queryData) {
-            console.log(`[🐿]\x1b[36m${queryData.sql}\x1b[0m`);
+            log('📫📭📬', `\x1b[0m\x1b[36m${queryData.sql}\x1b[0m`);
         });
     }
 
