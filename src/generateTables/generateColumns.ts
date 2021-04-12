@@ -6,7 +6,6 @@ import { buildObjectFieldTables } from './buildObjectFieldTables';
 import { buildScalarFieldTables } from './buildScalarFieldTables';
 import { buildListFields } from './buildListFields';
 import { recursivelyGetAllFieldTypeEntries } from './recursivelyGetAllFieldTypeEntries';
-import { GRAPHQL_ID } from '../graphqlConstants';
 
 export async function generateColumns({
     objectTypeNames,
