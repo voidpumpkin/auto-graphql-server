@@ -1,4 +1,4 @@
-import { isScalarType, isObjectType, isInterfaceType, isEqualType } from 'graphql';
+import { isScalarType, isObjectType, isInterfaceType, isEqualType, isListType } from 'graphql';
 
 import type Knex from 'knex';
 import type { IResolvers } from '@graphql-tools/utils';
@@ -30,6 +30,38 @@ export async function getAutoResolvers({
             }
             Object.entries(namedType.getFields()).forEach(([fieldName, fieldType]) => {
                 const fieldTypeType = fieldType.type;
+                if (isListType(fieldTypeType)) {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    //@ts-ignore
+                    autoResolvers[name][fieldName] = async (root, _, __, info) => {
+                        const queryType = info.schema.getQueryType();
+                        if (!queryType) {
+                            throw Error('QueryType not defined');
+                        }
+                        if (isEqualType(info.parentType, queryType)) {
+                            root = await knex(info.parentType.name).select('*').first();
+                            if (!root) {
+                                throw Error('Failed to query query');
+                            }
+                        }
+                        let selections: string[] = info.fieldNodes[0].selectionSet.selections.map(
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-ignore
+                            (selectionNode) => selectionNode.name.value
+                        );
+                        const resultTypeFields = info.returnType.ofType.getFields();
+                        for (const selection of selections) {
+                            if (isListType(resultTypeFields[selection].type)) {
+                                selections = [];
+                                break;
+                            }
+                        }
+                        const result = await knex(info.returnType.ofType.name)
+                            .select(...selections)
+                            .where({ [`__${info.parentType.name}_id`]: root.id });
+                        return result;
+                    };
+                }
                 if (isObjectType(fieldTypeType)) {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     //@ts-ignore
@@ -44,11 +76,18 @@ export async function getAutoResolvers({
                                 throw Error('Failed to query query');
                             }
                         }
-                        const selections = info.fieldNodes[0].selectionSet.selections.map(
+                        let selections: string[] = info.fieldNodes[0].selectionSet.selections.map(
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             //@ts-ignore
                             (selectionNode) => selectionNode.name.value
                         );
+                        const resultTypeFields = info.returnType.getFields();
+                        for (const selection of selections) {
+                            if (isListType(resultTypeFields[selection].type)) {
+                                selections = [];
+                                break;
+                            }
+                        }
                         const result = await knex(info.returnType.name)
                             .select(...selections)
                             .where({ id: root[info.fieldName] });

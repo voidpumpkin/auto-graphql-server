@@ -200,6 +200,153 @@ describe('Feature: Read operation', async () => {
                     });
                 });
             });
+            describe('And Book has field authors [Author]', async () => {
+                describe('And Author has field name String', async () => {
+                    describe('And database stores 2 Author', async () => {
+                        describe('And database stores 1 Book', async () => {
+                            describe('When a read books without args query is run', async () => {
+                                let knex: Knex;
+                                let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+                                before(async () => {
+                                    const sourceSchema = getSourceSchema({
+                                        typeDefs: `schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }`,
+                                    });
+                                    knex = Knex(config.database);
+                                    app = await createApp({ config, sourceSchema, knex });
+                                    await knex('Book').insert({});
+                                    await knex('Query').insert({ book: 1 });
+                                    await knex('Author').insert({ name: 'Fab', __Book_id: 1 });
+                                    await knex('Author').insert({ name: 'Holoman', __Book_id: 1 });
+                                });
+                                it('Expect to get correct authors names', async () => {
+                                    const query = `{ book{ authors{ name } } }`;
+                                    const response = await request(app.listen())
+                                        .post(`/`)
+                                        .set('Accept', 'application/json')
+                                        .send({ query });
+                                    expect(response.body).to.deep.equal({
+                                        data: {
+                                            book: {
+                                                authors: [{ name: 'Fab' }, { name: 'Holoman' }],
+                                            },
+                                        },
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+        describe('And Query has field books [Book]', async () => {
+            describe('And Book has field id ID', async () => {
+                describe('And database stores 2 Book', async () => {
+                    describe('When a read books without args query is run', async () => {
+                        let knex: Knex;
+                        let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+                        before(async () => {
+                            const sourceSchema = getSourceSchema({
+                                typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { id: ID }`,
+                            });
+                            knex = Knex(config.database);
+                            app = await createApp({ config, sourceSchema, knex });
+                            await knex('Query').insert({});
+                            await knex('Book').insert({ __Query_id: 1 });
+                            await knex('Book').insert({ __Query_id: 1 });
+                        });
+                        it('Expect to get correct books ids', async () => {
+                            const query = `{ books{ id } }`;
+                            const response = await request(app.listen())
+                                .post(`/`)
+                                .set('Accept', 'application/json')
+                                .send({ query });
+                            expect(response.body).to.deep.equal({
+                                data: { books: [{ id: '1' }, { id: '2' }] },
+                            });
+                        });
+                    });
+                });
+            });
+            describe('And Book has field author Author', async () => {
+                describe('And Author has field name String', async () => {
+                    describe('And database stores 2 Author', async () => {
+                        describe('And database stores 2 Book', async () => {
+                            describe('When a read books without args query is run', async () => {
+                                let knex: Knex;
+                                let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+                                before(async () => {
+                                    const sourceSchema = getSourceSchema({
+                                        typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { author: Author } type Author { name: String }`,
+                                    });
+                                    knex = Knex(config.database);
+                                    app = await createApp({ config, sourceSchema, knex });
+                                    await knex('Query').insert({});
+                                    await knex('Author').insert({ name: 'Sam' });
+                                    await knex('Author').insert({ name: 'Bob' });
+                                    await knex('Book').insert({ __Query_id: 1, author: 1 });
+                                    await knex('Book').insert({ __Query_id: 1, author: 2 });
+                                });
+                                it('Expect to get correct authors names', async () => {
+                                    const query = `{ books{ author{ name } } }`;
+                                    const response = await request(app.listen())
+                                        .post(`/`)
+                                        .set('Accept', 'application/json')
+                                        .send({ query });
+                                    expect(response.body).to.deep.equal({
+                                        data: {
+                                            books: [
+                                                { author: { name: 'Sam' } },
+                                                { author: { name: 'Bob' } },
+                                            ],
+                                        },
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+            describe('And Book has field authors [Author]', async () => {
+                describe('And Author has field name String', async () => {
+                    describe('And database stores 4 Author', async () => {
+                        describe('And database stores 2 Book', async () => {
+                            describe('When a read books without args query is run', async () => {
+                                let knex: Knex;
+                                let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+                                before(async () => {
+                                    const sourceSchema = getSourceSchema({
+                                        typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { authors: [Author] } type Author { name: String }`,
+                                    });
+                                    knex = Knex(config.database);
+                                    app = await createApp({ config, sourceSchema, knex });
+                                    await knex('Query').insert({});
+                                    await knex('Book').insert({ __Query_id: 1 });
+                                    await knex('Book').insert({ __Query_id: 1 });
+                                    await knex('Author').insert({ name: 'Sam', __Book_id: 2 });
+                                    await knex('Author').insert({ name: 'Bob', __Book_id: 2 });
+                                    await knex('Author').insert({ name: 'Fab', __Book_id: 1 });
+                                    await knex('Author').insert({ name: 'Holoman', __Book_id: 1 });
+                                });
+                                it('Expect to get correct authors names', async () => {
+                                    const query = `{ books{ authors{ name } } }`;
+                                    const response = await request(app.listen())
+                                        .post(`/`)
+                                        .set('Accept', 'application/json')
+                                        .send({ query });
+                                    expect(response.body).to.deep.equal({
+                                        data: {
+                                            books: [
+                                                { authors: [{ name: 'Fab' }, { name: 'Holoman' }] },
+                                                { authors: [{ name: 'Sam' }, { name: 'Bob' }] },
+                                            ],
+                                        },
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
         });
     });
 });
