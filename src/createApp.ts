@@ -9,7 +9,8 @@ import { getAutoResolvers } from './getAutoResolvers';
 import { generateTables } from './generateTables/generateTables';
 import { log } from './logger';
 
-import type { GraphQLSchema } from 'graphql';
+import { GraphQLSchema } from 'graphql';
+import { insertRootObjects } from './insertRootObjects';
 
 type Config = {
     port?: number;
@@ -59,6 +60,12 @@ export async function createApp({
     } catch (e) {
         console.error('Error happened while generating tables: ');
         throw e;
+    }
+
+    try {
+        await insertRootObjects(sourceSchema, knex);
+    } catch (e) {
+        console.error('Error happened while insertinf root objects into database');
     }
 
     let autoResolvers;
