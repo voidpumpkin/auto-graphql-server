@@ -1,6 +1,6 @@
 import Knex from 'knex';
 import { getKnexColumnType } from './graphqlScalarToKnexTypeMap';
-import { GRAPHQL_ID } from './constants';
+import { GRAPHQL_ID } from '../graphqlConstants';
 
 export function buildScalarFieldTables({
     scalarFieldTypeNameMap,

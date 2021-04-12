@@ -1,4 +1,4 @@
-import { isScalarType, isObjectType, isInterfaceType } from 'graphql';
+import { isScalarType, isObjectType, isInterfaceType, isEqualType } from 'graphql';
 
 import type Knex from 'knex';
 import type { IResolvers } from '@graphql-tools/utils';
@@ -26,10 +26,38 @@ export async function getAutoResolvers({
             //resolver
             const namedType = schemaTypeMap[name];
             if (!isObjectType(namedType)) {
-                throw new Error('Not object type');
+                throw Error('Not object type');
             }
             Object.entries(namedType.getFields()).forEach(([fieldName, fieldType]) => {
                 const fieldTypeType = fieldType.type;
+                if (isObjectType(fieldTypeType)) {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    //@ts-ignore
+                    autoResolvers[name][fieldName] = async (root, _, __, info) => {
+                        const queryType = info.schema.getQueryType();
+                        if (!queryType) {
+                            throw Error('QueryType not defined');
+                        }
+                        if (isEqualType(info.parentType, queryType)) {
+                            root = await knex(info.parentType.name).select('*').first();
+                            if (!root) {
+                                throw Error('Failed to query query');
+                            }
+                        }
+                        const selections = info.fieldNodes[0].selectionSet.selections.map(
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-ignore
+                            (selectionNode) => selectionNode.name.value
+                        );
+                        const result = await knex(info.returnType.name)
+                            .select(...selections)
+                            .where({ id: root[info.fieldName] });
+                        if (result.length > 1) {
+                            throw Error('More than one found');
+                        }
+                        return result[0];
+                    };
+                }
                 if (isScalarType(fieldTypeType)) {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     //@ts-ignore

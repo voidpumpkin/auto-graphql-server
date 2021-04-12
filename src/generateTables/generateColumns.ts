@@ -6,7 +6,7 @@ import { buildObjectFieldTables } from './buildObjectFieldTables';
 import { buildScalarFieldTables } from './buildScalarFieldTables';
 import { buildListFields } from './buildListFields';
 import { recursivelyGetAllFieldTypeEntries } from './recursivelyGetAllFieldTypeEntries';
-import { GRAPHQL_ID } from './constants';
+import { GRAPHQL_ID } from '../graphqlConstants';
 
 export async function generateColumns({
     objectTypeNames,
@@ -25,7 +25,7 @@ export async function generateColumns({
             }
             const objectType = schemaTypeMap[objectTypeName];
             if (!isObjectType(objectType)) {
-                throw new Error('Not object type');
+                throw Error('Not object type');
             }
 
             const fieldTypeEntries = recursivelyGetAllFieldTypeEntries(objectType);
@@ -35,14 +35,8 @@ export async function generateColumns({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const listFieldTypeMap: Record<string, GraphQLList<any>> = {};
             for (const [key, type] of fieldTypeEntries) {
-                if (isScalarType(type)) {
-                    if (key === 'id') {
-                        if (type?.name !== GRAPHQL_ID) {
-                            throw new Error(`'id' field can only be ID type`);
-                        }
-                    } else {
-                        scalarFieldTypeNameMap[key] = type.name;
-                    }
+                if (isScalarType(type) && key !== 'id') {
+                    scalarFieldTypeNameMap[key] = type.name;
                 } else if (isObjectType(type)) {
                     objectFieldNames.push(key);
                 } else if (isListType(type)) {

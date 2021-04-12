@@ -3,43 +3,11 @@ import { expect } from 'chai';
 import Knex from 'knex';
 
 import { createApp } from '../src/createApp';
-import { getSourceSchema } from '../src/getSourceSchema';
+import { getSourceSchema } from '../src/schema/getSourceSchema';
 
 import config from './testConfig.json';
 
 describe('Feature: Database table creation', async () => {
-    describe('Given schema has Book type', async () => {
-        describe('When source schema is parsed', async () => {
-            it('Expect error as only properties named mutation, query or subscription', async () => {
-                expect(() =>
-                    getSourceSchema({
-                        typeDefs: `schema { book: Book } type Book { name: String }`,
-                    })
-                ).to.throw();
-            });
-            it('Expect no error as property named mutation is allowed', async () => {
-                expect(() =>
-                    getSourceSchema({
-                        typeDefs: `schema { mutation: Book } type Book { name: String }`,
-                    })
-                ).to.not.throw();
-            });
-            it('Expect no error as property named query is allowed', async () => {
-                expect(() =>
-                    getSourceSchema({
-                        typeDefs: `schema { query: Book } type Book { name: String }`,
-                    })
-                ).to.not.throw();
-            });
-            it('Expect no error as property named subscription is allowed', async () => {
-                expect(() =>
-                    getSourceSchema({
-                        typeDefs: `schema { subscription: Book } type Book { name: String }`,
-                    })
-                ).to.not.throw();
-            });
-        });
-    });
     describe('Given schema has Query type', async () => {
         describe('And that type has one scalar', async () => {
             describe('When app is created', async () => {
@@ -99,7 +67,7 @@ describe('Feature: Database table creation', async () => {
                     let knex: Knex;
                     before(async () => {
                         const sourceSchema = getSourceSchema({
-                            typeDefs: `schema { query: Query } type Query { book: Book } type Book { name: String iteration: Int }`,
+                            typeDefs: `schema { query: Query } type Query { book(name: String): Book } type Book { name: String iteration: Int }`,
                         });
                         knex = Knex(config.database);
                         await createApp({ config, sourceSchema, knex });
@@ -139,7 +107,7 @@ describe('Feature: Database table creation', async () => {
                         let knex: Knex;
                         before(async () => {
                             const sourceSchema = getSourceSchema({
-                                typeDefs: `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`,
+                                typeDefs: `schema { query: Query } type Query { book(author: ID): Book } type Book { author: Author } type Author { name: String }`,
                             });
                             knex = Knex(config.database);
                             await createApp({ config, sourceSchema, knex });
@@ -181,7 +149,7 @@ describe('Feature: Database table creation', async () => {
                         let knex: Knex;
                         before(async () => {
                             const sourceSchema = getSourceSchema({
-                                typeDefs: `schema { query: Query } type Query { book: Book } type Book { author: Author book: Book } type Author { name: String }`,
+                                typeDefs: `schema { query: Query } type Query { book(author: ID): Book } type Book { author: Author book: Book } type Author { name: String }`,
                             });
                             knex = Knex(config.database);
                             await createApp({ config, sourceSchema, knex });
@@ -325,7 +293,7 @@ describe('Feature: Database table creation', async () => {
                     let knex: Knex;
                     before(async () => {
                         const sourceSchema = getSourceSchema({
-                            typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { name: String }`,
+                            typeDefs: `schema { query: Query } type Query { books(name: String): [Book] } type Book { name: String }`,
                         });
                         knex = Knex(config.database);
                         await createApp({ config, sourceSchema, knex });
@@ -459,7 +427,7 @@ describe('Feature: Database table creation', async () => {
                     describe('When app is created', async () => {
                         let knex: Knex;
                         before(async () => {
-                            const sourceSchema = getSourceSchema({
+                            const sourceSchema = await getSourceSchema({
                                 typeDefs: `schema { query: Query } type Query implements Face & Body { name: String } interface Face { score: Int } interface Body { hasLimbs: Boolean }`,
                             });
                             knex = Knex(config.database);
@@ -497,7 +465,7 @@ describe('Feature: Database table creation', async () => {
                 describe('When app is created', async () => {
                     let knex: Knex;
                     before(async () => {
-                        const sourceSchema = getSourceSchema({
+                        const sourceSchema = await getSourceSchema({
                             typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle { hasLimbs: Boolean }`,
                         });
                         knex = Knex(config.database);
@@ -532,7 +500,7 @@ describe('Feature: Database table creation', async () => {
                 describe('When app is created', async () => {
                     let knex: Knex;
                     before(async () => {
-                        const sourceSchema = getSourceSchema({
+                        const sourceSchema = await getSourceSchema({
                             typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle implements Figure { hasLimbs: Boolean } interface Figure { figureType: String }`,
                         });
                         knex = Knex(config.database);

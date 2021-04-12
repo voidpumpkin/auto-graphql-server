@@ -4,7 +4,7 @@ import mount from 'koa-mount';
 import graphqlHTTP from 'koa-graphql';
 import { addResolversToSchema } from '@graphql-tools/schema';
 
-import { getSourceSchema } from './getSourceSchema';
+import { getSourceSchema } from './schema/getSourceSchema';
 import { getAutoResolvers } from './getAutoResolvers';
 import { generateTables } from './generateTables/generateTables';
 import { log } from './logger';
@@ -29,10 +29,10 @@ export async function createApp({
     knex?: Knex;
 }): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
     if (!config) {
-        throw new Error('missing config');
+        throw Error('missing config');
     }
     if (!config?.database || typeof config.database !== 'object') {
-        throw new Error('config database field is incorrect or missing');
+        throw Error('config database field is incorrect or missing');
     }
 
     knex = knex || Knex(config.database);

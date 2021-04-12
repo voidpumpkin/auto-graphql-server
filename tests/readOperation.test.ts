@@ -6,7 +6,7 @@ import Knex from 'knex';
 import type Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import { getSourceSchema } from '../src/getSourceSchema';
+import { getSourceSchema } from '../src/schema/getSourceSchema';
 
 import config from './testConfig.json';
 
@@ -133,6 +133,70 @@ describe('Feature: Read operation', async () => {
                     expect(response.status).to.equal(200);
                     expect(response.body).to.deep.equal({
                         data: { isTrue: true },
+                    });
+                });
+            });
+        });
+        describe('And Query has field book Book', async () => {
+            describe('And Book has field id ID', async () => {
+                describe('And database stores 2 Book', async () => {
+                    describe('When a read book without args query is run', async () => {
+                        let knex: Knex;
+                        let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+                        before(async () => {
+                            const sourceSchema = getSourceSchema({
+                                typeDefs: `schema { query: Query } type Query { book: Book } type Book { id: ID }`,
+                            });
+                            knex = Knex(config.database);
+                            app = await createApp({ config, sourceSchema, knex });
+                            await knex('Book').insert({});
+                            await knex('Book').insert({});
+                            await knex('Query').insert({ book: 2 });
+                        });
+                        it('Expect to get correct book id', async () => {
+                            const query = `{ book{ id } }`;
+                            const response = await request(app.listen())
+                                .post(`/`)
+                                .set('Accept', 'application/json')
+                                .send({ query });
+                            expect(response.body).to.deep.equal({
+                                data: { book: { id: '2' } },
+                            });
+                        });
+                    });
+                });
+            });
+            describe('And Book has field title Title', async () => {
+                describe('And Title has field short String', async () => {
+                    describe('And database stores 2 Books', async () => {
+                        describe('And database stores 2 Titles', async () => {
+                            describe('When a read book without args query is run', async () => {
+                                let knex: Knex;
+                                let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+                                before(async () => {
+                                    const sourceSchema = getSourceSchema({
+                                        typeDefs: `schema { query: Query } type Query { book: Book } type Book { title: Title } type Title { short: String }`,
+                                    });
+                                    knex = Knex(config.database);
+                                    app = await createApp({ config, sourceSchema, knex });
+                                    await knex('Title').insert({ short: 'GOT' });
+                                    await knex('Title').insert({ short: 'LOTR' });
+                                    await knex('Book').insert({ title: 1 });
+                                    await knex('Book').insert({ title: 2 });
+                                    await knex('Query').insert({ book: 2 });
+                                });
+                                it('Expect to get correct title short', async () => {
+                                    const query = `{ book{ title{ short } } }`;
+                                    const response = await request(app.listen())
+                                        .post(`/`)
+                                        .set('Accept', 'application/json')
+                                        .send({ query });
+                                    expect(response.body).to.deep.equal({
+                                        data: { book: { title: { short: 'LOTR' } } },
+                                    });
+                                });
+                            });
+                        });
                     });
                 });
             });

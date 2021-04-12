@@ -1,7 +1,5 @@
-import { isObjectType } from 'graphql';
-
 import type Knex from 'knex';
-import type { GraphQLSchema } from 'graphql';
+import { GraphQLSchema, isObjectType } from 'graphql';
 
 import { generateColumns } from './generateColumns';
 import { applyTableConstraints } from './applyTableConstraints';

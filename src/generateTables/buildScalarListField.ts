@@ -1,6 +1,6 @@
 import { isScalarType, GraphQLList } from 'graphql';
 import Knex from 'knex';
-import { GRAPHQL_ID } from './constants';
+import { GRAPHQL_ID } from '../graphqlConstants';
 import { buildScalarFieldTables } from './buildScalarFieldTables';
 
 export async function buildScalarListField(

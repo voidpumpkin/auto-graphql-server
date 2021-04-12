@@ -15,7 +15,7 @@ export async function applyTableConstraints({
         objectTypeNames.map(async (objectTypeName) => {
             const objectType = schemaTypeMap[objectTypeName];
             if (!isObjectType(objectType)) {
-                throw new Error('Not object type');
+                throw Error('Not object type');
             }
 
             const directFieldEntries = Object.entries(objectType.getFields());
