@@ -15,6 +15,7 @@ type Config = {
     port?: number;
     schemaPath?: string;
     printSql?: boolean;
+    skipDbCreationIfExists?: boolean;
     graphqlHTTP?: Omit<graphqlHTTP.Options, 'schema'>;
     database?: Knex.Config;
 };
@@ -50,7 +51,11 @@ export async function createApp({
     }
 
     try {
-        await generateTables({ sourceSchema, knex });
+        await generateTables({
+            sourceSchema,
+            knex,
+            skipDbCreationIfExists: config.skipDbCreationIfExists,
+        });
     } catch (e) {
         console.error('Error happened while generating tables: ');
         throw e;

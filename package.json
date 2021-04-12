@@ -11,7 +11,7 @@
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "clean": "rm test.sqlite3",
         "lint": "eslint ./src/**/* --ext .js,.ts --fix",
-        "dev": "ts-node-dev src",
+        "dev": "ts-node-dev --watch schema.graphql src",
         "cleandev": "yarn clean && ts-node-dev src",
         "build": "rm -rf dist && tsc",
         "start": "ts-node src"

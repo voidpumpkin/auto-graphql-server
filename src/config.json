@@ -5,6 +5,7 @@
         "graphiql": true
     },
     "printSql": true,
+    "skipDbCreationIfExists": true,
     "database": {
         "client": "sqlite",
         "connection": {
