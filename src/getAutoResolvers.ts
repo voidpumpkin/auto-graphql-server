@@ -44,22 +44,35 @@ export async function getAutoResolvers({
                                 throw Error('Failed to query query');
                             }
                         }
-                        let selections: string[] = info.fieldNodes[0].selectionSet.selections.map(
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            //@ts-ignore
-                            (selectionNode) => selectionNode.name.value
-                        );
-                        const resultTypeFields = info.returnType.ofType.getFields();
-                        for (const selection of selections) {
-                            if (isListType(resultTypeFields[selection].type)) {
-                                selections = [];
-                                break;
-                            }
+                        const resultType = info.returnType.ofType;
+
+                        if (isScalarType(resultType)) {
+                            const knexResult = await knex(
+                                `__${info.parentType.name}_${info.fieldName}_list`
+                            )
+                                .select('value')
+                                .where({ [`__${info.parentType.name}_id`]: root.id });
+                            return knexResult.map((row) => row.value);
                         }
-                        const result = await knex(info.returnType.ofType.name)
-                            .select(...selections)
-                            .where({ [`__${info.parentType.name}_id`]: root.id });
-                        return result;
+                        if (isObjectType(resultType)) {
+                            let selections: string[] = info.fieldNodes[0].selectionSet.selections.map(
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                //@ts-ignore
+                                (selectionNode) => selectionNode.name.value
+                            );
+                            const resultTypeFields = info.returnType.ofType.getFields();
+                            for (const selection of selections) {
+                                if (isListType(resultTypeFields[selection].type)) {
+                                    selections = [];
+                                    break;
+                                }
+                            }
+                            const result = await knex(info.returnType.ofType.name)
+                                .select(...selections)
+                                .where({ [`__${info.parentType.name}_id`]: root.id });
+                            return result;
+                        }
+                        throw Error('field return array type is neither object nor scalar');
                     };
                 }
                 if (isObjectType(fieldTypeType)) {
