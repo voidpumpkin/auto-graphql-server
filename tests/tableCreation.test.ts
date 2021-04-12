@@ -529,17 +529,6 @@ Feature('💽Lentelių generavimas', async () => {
                 expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
                 expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
                 expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.string('boolean');
-                And(
-                    'tipų kurie yra tevų objiekte kaip sąrašas lentelės turi turėti svetimus tėvų raktų stulpelius',
-                    async () => {
-                        expect(await knex.schema.hasColumn('Book', '__Query_id')).to.be.true;
-                    }
-                );
-                And('jų tipai turi būti teisingi', async () => {
-                    expect((await knex('Book').columnInfo('__Query_id')).type).to.be.string(
-                        'integer'
-                    );
-                });
             });
         });
         Scenario("Objiektas paveldi Interface'a kuris paveldi kitą Interface'a", async () => {
@@ -574,17 +563,6 @@ Feature('💽Lentelių generavimas', async () => {
                 expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
                 expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
                 expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.string('boolean');
-                And(
-                    'tipų kurie yra tevų objiekte kaip sąrašas lentelės turi turėti svetimus tėvų raktų stulpelius',
-                    async () => {
-                        expect(await knex.schema.hasColumn('Book', '__Query_id')).to.be.true;
-                    }
-                );
-                And('jų tipai turi būti teisingi', async () => {
-                    expect((await knex('Book').columnInfo('__Query_id')).type).to.be.string(
-                        'integer'
-                    );
-                });
             });
         });
     });
