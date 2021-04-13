@@ -1,5 +1,4 @@
 import { GraphQLObjectType, isObjectType } from 'graphql';
-//import { validateQueryFields } from './validateQueryFields';
 
 export function validateQueryType(queryType: undefined | null | GraphQLObjectType): void {
     if (!queryType) {
@@ -8,5 +7,4 @@ export function validateQueryType(queryType: undefined | null | GraphQLObjectTyp
     if (!isObjectType(queryType)) {
         throw Error('query type has to be an object');
     }
-    //validateQueryFields(queryType);
 }
