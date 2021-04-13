@@ -8,7 +8,7 @@ import Knex from 'knex';
 import { getSourceSchema } from './schema/getSourceSchema';
 import { getAutoResolvers } from './getAutoResolvers';
 import { generateDatabase } from './generateDatabase/generateDatabase';
-import { insertRootObjects } from './insertRootObjects';
+import { insertRootQueryObject } from './insertRootQueryObject';
 
 export type Config = {
     port?: number;
@@ -47,9 +47,9 @@ export async function createApp({
     }
 
     try {
-        await insertRootObjects(sourceSchema, knex);
+        await insertRootQueryObject(sourceSchema, knex);
     } catch (e) {
-        console.error('Error happened while insertinf root objects into database');
+        console.error('Error happened while inserting root objects into database');
     }
 
     let autoResolvers;
