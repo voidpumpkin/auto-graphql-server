@@ -17,7 +17,7 @@ export function getSourceSchema({
         if (!schemaPath) {
             throw Error('TypeDefs or SchemaPath required');
         }
-        const schemaFilePath = path.join(__dirname, '../../schema.graphql');
+        const schemaFilePath = path.join(__dirname, `../${schemaPath}`);
         typeDefs = fs.readFileSync(schemaFilePath, 'utf8');
     }
 
