@@ -7,7 +7,7 @@ import { buildScalarFieldTables } from './buildScalarFieldTables';
 import { buildListFields } from './buildListFields';
 import { recursivelyGetAllFieldTypeEntries } from './recursivelyGetAllFieldTypeEntries';
 
-export async function generateColumns({
+export async function generateTables({
     objectTypeNames,
     knex,
     schemaTypeMap,

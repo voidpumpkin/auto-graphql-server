@@ -4,8 +4,9 @@
     "graphqlHTTP": {
         "graphiql": true
     },
-    "printSql": true,
-    "skipDbCreationIfExists": true,
+    "printSql": false,
+    "skipDbCreationIfExists": false,
+    "deleteDbCreationIfExists": false,
     "database": {
         "client": "sqlite",
         "connection": {

@@ -1,22 +1,21 @@
-import Knex from 'knex';
 import Koa from 'koa';
 import mount from 'koa-mount';
 import graphqlHTTP from 'koa-graphql';
 import { addResolversToSchema } from '@graphql-tools/schema';
+import { GraphQLSchema } from 'graphql';
+import Knex from 'knex';
 
 import { getSourceSchema } from './schema/getSourceSchema';
 import { getAutoResolvers } from './getAutoResolvers';
-import { generateTables } from './generateTables/generateTables';
-import { log } from './logger';
-
-import { GraphQLSchema } from 'graphql';
+import { generateDatabase } from './generateDatabase/generateDatabase';
 import { insertRootObjects } from './insertRootObjects';
 
-type Config = {
+export type Config = {
     port?: number;
     schemaPath?: string;
     printSql?: boolean;
     skipDbCreationIfExists?: boolean;
+    deleteDbCreationIfExists?: boolean;
     graphqlHTTP?: Omit<graphqlHTTP.Options, 'schema'>;
     database?: Knex.Config;
 };
@@ -24,24 +23,12 @@ type Config = {
 export async function createApp({
     config,
     sourceSchema,
-    knex,
 }: {
     config: Config | undefined;
     sourceSchema?: GraphQLSchema;
-    knex?: Knex;
-}): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
+}): Promise<{ app: Koa<Koa.DefaultState, Koa.DefaultContext>; knex: Knex }> {
     if (!config) {
         throw Error('missing config');
-    }
-    if (!config?.database || typeof config.database !== 'object') {
-        throw Error('config database field is incorrect or missing');
-    }
-
-    knex = knex || Knex(config.database);
-    if (config.printSql) {
-        knex.on('query', function (queryData) {
-            log('📫📭📬', `\x1b[0m\x1b[36m${queryData.sql}\x1b[0m`);
-        });
     }
 
     try {
@@ -51,12 +38,9 @@ export async function createApp({
         throw e;
     }
 
+    let knex: Knex;
     try {
-        await generateTables({
-            sourceSchema,
-            knex,
-            skipDbCreationIfExists: config.skipDbCreationIfExists,
-        });
+        knex = await generateDatabase({ sourceSchema, config });
     } catch (e) {
         console.error('Error happened while generating tables: ');
         throw e;
@@ -85,5 +69,5 @@ export async function createApp({
 
     app.use(mount('/', graphqlHTTP({ schema, ...config.graphqlHTTP })));
 
-    return app;
+    return { app, knex };
 }

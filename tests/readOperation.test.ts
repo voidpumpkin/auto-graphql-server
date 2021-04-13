@@ -14,7 +14,6 @@ should();
 Feature('👓Skaitymo operacijos', async () => {
     Feature('Skaliarų skaitymo operacijos', async () => {
         Scenario('Schema turi ID skaliarą', async () => {
-            let knex: Knex;
             let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
             const query = `{ id }`;
             let response: request.Response;
@@ -22,8 +21,8 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { id: ID }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -53,8 +52,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { executionCount: Int }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ executionCount: 1 });
             });
 
@@ -85,8 +85,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { executionCount: Float }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ executionCount: 1.2 });
             });
 
@@ -117,8 +118,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { name: String }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ name: 'bob' });
             });
 
@@ -149,8 +151,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { isTrue: Boolean }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ isTrue: true });
             });
 
@@ -182,8 +185,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { book: Book } type Book { id: ID }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -217,8 +221,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { book: Book } type Book { title: Title } type Title { short: String }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -261,8 +266,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { ids: [ID] } `,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -295,8 +301,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { ids: [ID] } `,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -329,8 +336,9 @@ Feature('👓Skaitymo operacijos', async () => {
                 const sourceSchema = getSourceSchema({
                     typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { id: ID }`,
                 });
-                knex = Knex(config.database);
-                app = await createApp({ config, sourceSchema, knex });
+                const creationResult = await createApp({ config, sourceSchema });
+                app = creationResult.app;
+                knex = creationResult.knex;
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -365,8 +373,9 @@ Feature('👓Skaitymo operacijos', async () => {
                     const sourceSchema = getSourceSchema({
                         typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { author: Author } type Author { name: String }`,
                     });
-                    knex = Knex(config.database);
-                    app = await createApp({ config, sourceSchema, knex });
+                    const creationResult = await createApp({ config, sourceSchema });
+                    app = creationResult.app;
+                    knex = creationResult.knex;
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -411,8 +420,9 @@ Feature('👓Skaitymo operacijos', async () => {
                     const sourceSchema = getSourceSchema({
                         typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { authors: [Author] } type Author { name: String }`,
                     });
-                    knex = Knex(config.database);
-                    app = await createApp({ config, sourceSchema, knex });
+                    const creationResult = await createApp({ config, sourceSchema });
+                    app = creationResult.app;
+                    knex = creationResult.knex;
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -459,8 +469,9 @@ Feature('👓Skaitymo operacijos', async () => {
                     const sourceSchema = getSourceSchema({
                         typeDefs: `schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }`,
                     });
-                    knex = Knex(config.database);
-                    app = await createApp({ config, sourceSchema, knex });
+                    const creationResult = await createApp({ config, sourceSchema });
+                    app = creationResult.app;
+                    knex = creationResult.knex;
                 });
 
                 Given(`užklausai "${query}"`, () => {
