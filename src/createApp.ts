@@ -5,7 +5,7 @@ import { addResolversToSchema } from '@graphql-tools/schema';
 import { GraphQLSchema } from 'graphql';
 import Knex from 'knex';
 
-import { getSourceSchema } from './schema/getSourceSchema';
+import { getResolverlessSchema } from './schema/getResolverlessSchema';
 import { getAutoResolvers } from './getAutoResolvers';
 import { generateDatabase } from './generateDatabase/generateDatabase';
 import { insertRootQueryObject } from './insertRootQueryObject';
@@ -22,17 +22,17 @@ export type Config = {
 
 export async function createApp({
     config,
-    sourceSchema,
+    resolverlessSchema: sourceSchema,
 }: {
     config: Config | undefined;
-    sourceSchema?: GraphQLSchema;
+    resolverlessSchema?: GraphQLSchema;
 }): Promise<{ app: Koa<Koa.DefaultState, Koa.DefaultContext>; knex: Knex }> {
     if (!config) {
         throw Error('missing config');
     }
 
     try {
-        sourceSchema = sourceSchema || getSourceSchema({ schemaPath: config.schemaPath });
+        sourceSchema = sourceSchema || getResolverlessSchema({ schemaPath: config.schemaPath });
     } catch (e) {
         console.error('Your schema has errors: ');
         throw e;
@@ -54,7 +54,7 @@ export async function createApp({
 
     let autoResolvers;
     try {
-        autoResolvers = await getAutoResolvers({ sourceSchema, knex });
+        autoResolvers = getAutoResolvers({ sourceSchema, knex });
     } catch (e) {
         console.error('Error happened while generating resolvers: ');
         throw e;

@@ -4,7 +4,7 @@ import 'mocha-cakes-2';
 import Knex from 'knex';
 
 import { createApp } from '../src/createApp';
-import { getSourceSchema } from '../src/schema/getSourceSchema';
+import { getResolverlessSchema } from '../src/schema/getResolverlessSchema';
 
 import config from './testConfig.json';
 import { GraphQLSchema } from 'graphql';
@@ -13,14 +13,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature('Query lentelės generavimas su skaliariniais tipais', async () => {
         Scenario('Schemos query turi String skaliarinį tipą', async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query { name: String }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurta Query lentelė', async () => {
@@ -38,14 +38,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario('Schemos query turi 2 skaliarinius tipus', async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query { name: String iteration: Int }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurta Query lentelė', async () => {
@@ -67,14 +67,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature('Objiektų tipo esybių lentelių generavimas', async () => {
         Scenario('Schemos query turi 1 objiekto tipą', async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query { book: Book } type Book { name: String iteration: Int }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -108,14 +108,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             'Schemos query turi objiekto tipą kuris turi kitą objiekto tipą ir tipą kuris turi dar savo objiekto tipą',
             async () => {
                 let knex: Knex;
-                let sourceSchema: GraphQLSchema;
+                let resolverlessSchema: GraphQLSchema;
                 before(async () => {
-                    sourceSchema = getSourceSchema({
+                    resolverlessSchema = getResolverlessSchema({
                         typeDefs: `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`,
                     });
                 });
                 When('kuriamas serveris', async () => {
-                    const { knex: _knex } = await createApp({ config, sourceSchema });
+                    const { knex: _knex } = await createApp({ config, resolverlessSchema });
                     knex = _knex;
                 });
                 Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -156,14 +156,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature('Skaliarinių sarašų tipo esybių lentelių generavimas', async () => {
         Scenario('Schemos query turi skaliarinį sąrašą', async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query { probabilities: [Float] }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -203,14 +203,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario('Schemos query turi 2 skaliarinius sąrašus', async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query { probabilities: [Float] executionResults: [Boolean] }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -269,14 +269,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature('Objiektų sarašų tipo esybių lentelių generavimas', async () => {
         Scenario('Schemos query turi objiekto tipo sąrašą', async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { name: String }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -311,14 +311,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             'Schemos query turi objiekto tipo sąrašą kuris turi objiekto tipo sąrašą',
             async () => {
                 let knex: Knex;
-                let sourceSchema: GraphQLSchema;
+                let resolverlessSchema: GraphQLSchema;
                 before(async () => {
-                    sourceSchema = getSourceSchema({
+                    resolverlessSchema = getResolverlessSchema({
                         typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { author: [Author] } type Author { name: String }`,
                     });
                 });
                 When('kuriamas serveris', async () => {
-                    const { knex: _knex } = await createApp({ config, sourceSchema });
+                    const { knex: _knex } = await createApp({ config, resolverlessSchema });
                     knex = _knex;
                 });
                 Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -363,14 +363,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature("Lentelių generavimas su interface'ais", async () => {
         Scenario("Interface'sas turi 1 skaliarinio tipo esybę", async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { score: Int }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -400,14 +400,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario("Interface'sas turi skaliarinio tipo sąrašą", async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { scores: [Int] }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -451,14 +451,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario("Interface'sas turi objiekto tipo sąrašą", async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { books: [Book] } type Book { name: String }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -493,14 +493,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario("Objiektas paveldi 2 Interface'sus", async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query implements Face & Body { name: String } interface Face { score: Int } interface Body { hasLimbs: Boolean }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
@@ -525,14 +525,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario("Objiektas paveldi Interface'a kuris paveldi kitą Interface'a", async () => {
             let knex: Knex;
-            let sourceSchema: GraphQLSchema;
+            let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                sourceSchema = getSourceSchema({
+                resolverlessSchema = getResolverlessSchema({
                     typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle { hasLimbs: Boolean }`,
                 });
             });
             When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({ config, sourceSchema });
+                const { knex: _knex } = await createApp({ config, resolverlessSchema });
                 knex = _knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {

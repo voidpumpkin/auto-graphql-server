@@ -1,15 +1,15 @@
 import { expect } from 'chai';
 import 'mocha-cakes-2';
 
-import { getSourceSchema } from '../src/schema/getSourceSchema';
+import { getResolverlessSchema } from '../src/schema/getResolverlessSchema';
 
 Feature('🛑Schemos validacija', async () => {
-    Feature('Schemos šakninio tipo esybių pavadinimų validacijos', async () => {
+    Feature('Schemos šakninio query tipo esybių pavadinimų validacijos', async () => {
         Scenario('Nevalidus pavadinimas book', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { book: Book } type Book { name: String }`,
                     });
             });
@@ -20,18 +20,18 @@ Feature('🛑Schemos validacija', async () => {
                 }
             );
         });
-        Scenario('Validus pavadinimas mutation', async () => {
+        Scenario('Nevalidus pavadinimas mutation', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { mutation: Book } type Book { name: String }`,
                     });
             });
             Then(
-                'turi nemesti validavimo klaidos, nes mutation pavadinimas yra leidžiamas šakninei esybei ',
+                'turi mesti validavimo klaidą, nes mutation pavadinimas yra automatiškai sugeneruojamas',
                 async () => {
-                    expect(wrapedFunction).to.not.throw();
+                    expect(wrapedFunction).to.throw();
                 }
             );
         });
@@ -39,7 +39,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { subscription: Book } type Book { name: String }`,
                     });
             });
@@ -54,7 +54,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: Book } type Book { name: String }`,
                     });
             });
@@ -71,7 +71,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: ID }`,
                     });
             });
@@ -86,7 +86,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: String }`,
                     });
             });
@@ -101,7 +101,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: Int }`,
                     });
             });
@@ -116,7 +116,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: Float }`,
                     });
             });
@@ -131,7 +131,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: Boolean }`,
                     });
             });
@@ -146,7 +146,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: [Boolean] }`,
                     });
             });
@@ -161,7 +161,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getSourceSchema({
+                    getResolverlessSchema({
                         typeDefs: `schema { query: [Book] } type Book { id: ID }`,
                     });
             });
@@ -172,5 +172,20 @@ Feature('🛑Schemos validacija', async () => {
                 }
             );
         });
+    });
+    Scenario('Schema turi tipą Mutation', async () => {
+        let wrapedFunction: () => void;
+        When('validuojama schema', async () => {
+            wrapedFunction = () =>
+                getResolverlessSchema({
+                    typeDefs: `schema { query: Book } type Book { mut: Mutation } type Mutation { book: Book }`,
+                });
+        });
+        Then(
+            'turi mesti validavimo klaidą, nes Mutation tipas yra automatiškia generuojamas',
+            async () => {
+                expect(wrapedFunction).to.throw();
+            }
+        );
     });
 });
