@@ -5,8 +5,8 @@ import { addResolversToSchema } from '@graphql-tools/schema';
 import { GraphQLSchema } from 'graphql';
 import Knex from 'knex';
 
-import { getResolverlessSchema } from './schema/getResolverlessSchema';
-import { getAutoResolvers } from './getAutoResolvers';
+import { getResolverlessSchema } from './getResolverlessSchema/getResolverlessSchema';
+import { getAutoResolvers } from './getAutoResolvers/getAutoResolvers';
 import { generateDatabase } from './generateDatabase/generateDatabase';
 import { insertRootQueryObject } from './insertRootQueryObject';
 

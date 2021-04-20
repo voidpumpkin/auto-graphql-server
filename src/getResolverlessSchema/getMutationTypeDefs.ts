@@ -1,5 +1,5 @@
 import { GraphQLSchema, isEqualType, isObjectType, GraphQLObjectType } from 'graphql';
-import { getMutationStrings } from './getMutationStrings';
+import { getMutationStrings, defaultInputArg, defaultFilterArg } from './getMutationStrings';
 
 export function getMutationTypeDefs(userDefinedSchema: GraphQLSchema): string {
     const schemaTypeMap = userDefinedSchema.getTypeMap();
@@ -21,8 +21,11 @@ export function getMutationTypeDefs(userDefinedSchema: GraphQLSchema): string {
             // mutationFields += mutationFieldAdditions;
             // mutationTypeDefs += inputTypes;
         } else {
-            const { mutationFieldAdditions, inputTypes } = getMutationStrings(namedType, ['add']);
-            mutationFields += mutationFieldAdditions;
+            const { rootMutationFields, inputTypes } = getMutationStrings(namedType, {
+                add: { args: [defaultInputArg] },
+                remove: { args: [defaultFilterArg], returnsList: true },
+            });
+            mutationFields += rootMutationFields;
             mutationTypeDefs += inputTypes;
         }
     });

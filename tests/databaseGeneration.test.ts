@@ -4,7 +4,7 @@ import 'mocha-cakes-2';
 import Knex from 'knex';
 
 import { createApp } from '../src/createApp';
-import { getResolverlessSchema } from '../src/schema/getResolverlessSchema';
+import { getResolverlessSchema } from '../src/getResolverlessSchema/getResolverlessSchema';
 
 import config from './testConfig.json';
 import { GraphQLSchema } from 'graphql';

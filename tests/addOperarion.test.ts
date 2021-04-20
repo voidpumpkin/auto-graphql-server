@@ -6,7 +6,7 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import { getResolverlessSchema } from '../src/schema/getResolverlessSchema';
+import { getResolverlessSchema } from '../src/getResolverlessSchema/getResolverlessSchema';
 import config from './testConfig.json';
 
 should();
@@ -225,6 +225,8 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 (await knex('Book').where({ probability: 2.2 }).first()).should.be.ok;
             });
         });
+    });
+    Feature('Sarašų ir objiketų pridėjimo į duomenų bazę operacijos', async () => {
         Scenario('Schemos Query tipas turi Book sąrašą', async () => {
             let knex: Knex;
             let app: Koa<Koa.DefaultState, Koa.DefaultContext>;

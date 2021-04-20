@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import 'mocha-cakes-2';
 
-import { getResolverlessSchema } from '../src/schema/getResolverlessSchema';
+import { getResolverlessSchema } from '../src/getResolverlessSchema/getResolverlessSchema';
 
 Feature('🛑Schemos validacija', async () => {
     Feature('Schemos šakninio query tipo esybių pavadinimų validacijos', async () => {
