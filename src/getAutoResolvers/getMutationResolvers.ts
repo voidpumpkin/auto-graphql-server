@@ -5,6 +5,7 @@ import { GraphQLSchema } from 'graphql';
 import { getArgInputs } from './listInputs';
 import { createObjectTypeFieldResolver } from './createObjectTypeFieldResolver';
 import { createListTypeFieldResolver } from './createListTypeFieldResolver';
+import { createModifyRootObject } from './createModifyRootObject';
 
 export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): IResolvers {
     const resolvers: IResolvers = { Mutation: {} };
@@ -12,7 +13,7 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
     if (!mutationType) {
         return {};
     }
-    // const mutationTypeName = mutationType.name;
+    const mutationTypeName = mutationType.name;
     const queryType = sourceSchema.getQueryType();
     if (!queryType) {
         throw Error('QueryType not defined');
@@ -87,43 +88,70 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                 return await returnResolver({}, undefined, undefined, info);
             };
         } else if (fieldName.startsWith('update')) {
+            const isQueryType = returnTypeName === queryType.name;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
-            resolvers.Mutation[fieldName] = async () => {
-                return null;
-                // const mutationType = info.schema.getMutationType();
-                // const modifyRootObject = createModifyRootObject(
-                //     queryTypeName,
-                //     mutationTypeName,
-                //     mutationType
-                // );
-                // root = await modifyRootObject(info, root, knex);
+            resolvers.Mutation[fieldName] = async (root, args, __, info) => {
+                const mutationType = info.schema.getMutationType();
+                const modifyRootObject = createModifyRootObject(
+                    queryTypeName,
+                    mutationTypeName,
+                    mutationType
+                );
+                root = await modifyRootObject(info, root, knex);
 
-                // let selections: string[] = info.fieldNodes[0].selectionSet.selections.map(
-                //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                //     //@ts-ignore
-                //     (selectionNode) => selectionNode.name.value
-                // );
-                // const resultTypeFields = info.returnType.getFields();
-                // for (const selection of selections) {
-                //     if (isListType(resultTypeFields[selection].type)) {
-                //         selections = [];
-                //         break;
-                //     }
-                // }
-                // await knex(info.returnType.name).where({ id: root.id }).update(args.input);
-                // const result = await knex(info.returnType.name)
-                //     .select(...selections)
-                //     .where({ id: root.id });
-                // if (result.length > 1) {
-                //     throw Error('More than one found');
-                // }
-                // return result[0];
+                const [nonListInputs, listInputs] = getArgInputs(
+                    args.input,
+                    listFields,
+                    nonListFields
+                );
+
+                if (Object.keys(nonListInputs).length) {
+                    await knex(returnTypeName).where({ id: root.id }).update(nonListInputs);
+                }
+
+                await Promise.all(
+                    Object.entries(listInputs).map(async ([inputName, valueList]) =>
+                        Promise.all(
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            valueList.map(async (value: any) => {
+                                if (isScalarType(listFields[inputName].type.ofType)) {
+                                    const tableName = `__${returnTypeName}_${inputName}_list`;
+                                    const relationshipName = `__${returnTypeName}_id`;
+                                    await knex(tableName)
+                                        .where({ [relationshipName]: root.id })
+                                        .delete();
+                                    await knex(tableName).insert({
+                                        value,
+                                        [relationshipName]: root.id,
+                                    });
+                                } else {
+                                    await knex(listFields[inputName].type.ofType.name)
+                                        .where({ id: value })
+                                        .update({
+                                            [`__${returnTypeName}_id`]: root.id,
+                                        });
+                                }
+                            })
+                        )
+                    )
+                );
+
+                const queryWhere = isQueryType ? { id: root.id } : args.filter;
+                const returnResolver = createListTypeFieldResolver(
+                    knex,
+                    info.returnType,
+                    queryTypeName,
+                    queryWhere
+                );
+                const results = await returnResolver(root, undefined, undefined, info);
+
+                return results;
             };
         } else if (fieldName.startsWith('remove')) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
-            resolvers.Mutation[fieldName] = async (root, args, __, info) => {
+            resolvers.Mutation[fieldName] = async (_, args, __, info) => {
                 const returnResolver = createListTypeFieldResolver(
                     knex,
                     info.returnType,

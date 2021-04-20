@@ -29,7 +29,9 @@ export async function generateDatabase({
 
     const schemaTypeMap = sourceSchema.getTypeMap();
     const objectTypeNames = Object.entries(schemaTypeMap)
-        .filter(([key, val]) => isObjectType(val) && key.substr(0, 2) !== '__')
+        .filter(
+            ([key, val]) => isObjectType(val) && key.substr(0, 2) !== '__' && key !== 'Mutation'
+        )
         .map(([key]) => key);
     const doesDbAlreadyExist = await knex.schema.hasTable(objectTypeNames[0]);
 

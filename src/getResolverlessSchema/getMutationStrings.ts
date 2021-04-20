@@ -4,7 +4,7 @@ export const defaultInputArg: ArgData = {
     name: 'input',
     typeNameEnding: 'Input',
 };
-export const defaultFilterArg: ArgData = {
+const defaultFilterArg: ArgData = {
     name: 'filter',
     typeNameEnding: 'FilterInput',
     disAllowListFields: true,
