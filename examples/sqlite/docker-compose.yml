@@ -1,0 +1,12 @@
+# docker-compose -f ./examples/sqlite/docker-compose.yml -p ags_sqlite up
+version: '3'
+services:
+    server:
+        build: ../..
+        ports:
+            - '3001:3001'
+        volumes:
+            - data:/app/data
+        container_name: ags_sqlite_server
+volumes:
+    data:
