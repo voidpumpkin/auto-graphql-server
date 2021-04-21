@@ -18,9 +18,9 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {typeCount: 3}) { typeCount } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { typeCount: Int }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { typeCount: Int }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -54,9 +54,9 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {book: "1"}) { book { id } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { id: ID }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -94,9 +94,9 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {bookNames: ["bob","sam"]}) { bookNames } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { bookNames: [String] }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { bookNames: [String] }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -142,9 +142,9 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {books: ["1","2"]}) { books { id } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { id: ID }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { books: [Book] } type Book { id: ID }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,

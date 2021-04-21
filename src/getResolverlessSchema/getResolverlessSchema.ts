@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { mergeSchemas } from '@graphql-tools/merge';
 
@@ -9,19 +8,9 @@ import { validateObjectTypesIdFields } from './validateObjectTypesIdFields';
 import { validateAutomaticlyGenerated } from './validateAutomaticlyGenerated';
 import { getMutationTypeDefs } from './getMutationTypeDefs';
 
-export function getResolverlessSchema({
-    schemaPath,
-    typeDefs,
-}: {
-    schemaPath?: string;
-    typeDefs?: string;
-}): GraphQLSchema {
+export function getResolverlessSchema(typeDefs?: string): GraphQLSchema {
     if (!typeDefs) {
-        if (!schemaPath) {
-            throw Error('TypeDefs or SchemaPath required');
-        }
-        const schemaFilePath = path.join(__dirname, `../${schemaPath}`);
-        typeDefs = fs.readFileSync(schemaFilePath, 'utf8');
+        typeDefs = fs.readFileSync('./data/schema.graphql', 'utf8');
     }
 
     //nesesary for validation before adding generated fields and types

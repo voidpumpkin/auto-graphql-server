@@ -1,6 +1,7 @@
 .vscode
 *.sqlite3
 mochawesome-report/
+data/
 
 # Logs
 logs

@@ -15,9 +15,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { name: String }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { name: String }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -40,9 +40,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { name: String iteration: Int }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { name: String iteration: Int }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -69,9 +69,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { book: Book } type Book { name: String iteration: Int }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { book: Book } type Book { name: String iteration: Int }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -110,9 +110,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 let knex: Knex;
                 let resolverlessSchema: GraphQLSchema;
                 before(async () => {
-                    resolverlessSchema = getResolverlessSchema({
-                        typeDefs: `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`,
-                    });
+                    resolverlessSchema = getResolverlessSchema(
+                        `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`
+                    );
                 });
                 When('kuriamas serveris', async () => {
                     const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -158,9 +158,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { probabilities: [Float] }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { probabilities: [Float] }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -205,9 +205,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { probabilities: [Float] executionResults: [Boolean] }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { probabilities: [Float] executionResults: [Boolean] }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -271,9 +271,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             before(async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { name: String }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { books: [Book] } type Book { name: String }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -313,9 +313,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 let knex: Knex;
                 let resolverlessSchema: GraphQLSchema;
                 before(async () => {
-                    resolverlessSchema = getResolverlessSchema({
-                        typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { author: [Author] } type Author { name: String }`,
-                    });
+                    resolverlessSchema = getResolverlessSchema(
+                        `schema { query: Query } type Query { books: [Book] } type Book { author: [Author] } type Author { name: String }`
+                    );
                 });
                 When('kuriamas serveris', async () => {
                     const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -365,9 +365,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { score: Int }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query implements Face { name: String } interface Face { score: Int }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -402,9 +402,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { scores: [Int] }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query implements Face { name: String } interface Face { scores: [Int] }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -453,9 +453,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face { books: [Book] } type Book { name: String }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query implements Face { name: String } interface Face { books: [Book] } type Book { name: String }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -495,9 +495,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query implements Face & Body { name: String } interface Face { score: Int } interface Body { hasLimbs: Boolean }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query implements Face & Body { name: String } interface Face { score: Int } interface Body { hasLimbs: Boolean }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });
@@ -527,9 +527,9 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             let knex: Knex;
             let resolverlessSchema: GraphQLSchema;
             Given('schemos query implementuoja interfacą su 1 skaliariniu tipu ', async () => {
-                resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle { hasLimbs: Boolean }`,
-                });
+                resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle { hasLimbs: Boolean }`
+                );
             });
             When('kuriamas serveris', async () => {
                 const { knex: _knex } = await createApp({ config, resolverlessSchema });

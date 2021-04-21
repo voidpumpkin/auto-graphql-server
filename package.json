@@ -11,7 +11,6 @@
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "lint": "eslint ./src/**/* --ext .js,.ts --fix",
         "dev": "ts-node-dev --watch schema.graphql src",
-        "build": "rm -rf dist && tsc",
         "start": "ts-node src"
     },
     "dependencies": {

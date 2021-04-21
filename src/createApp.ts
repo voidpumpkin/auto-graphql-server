@@ -10,16 +10,6 @@ import { getAutoResolvers } from './getAutoResolvers/getAutoResolvers';
 import { generateDatabase } from './generateDatabase/generateDatabase';
 import { insertRootQueryObject } from './insertRootQueryObject';
 
-export type Config = {
-    port?: number;
-    schemaPath?: string;
-    printSql?: boolean;
-    skipDbCreationIfExists?: boolean;
-    deleteDbCreationIfExists?: boolean;
-    graphqlHTTP?: Omit<graphqlHTTP.Options, 'schema'>;
-    database?: Knex.Config;
-};
-
 export async function createApp({
     config,
     resolverlessSchema: sourceSchema,
@@ -32,7 +22,7 @@ export async function createApp({
     }
 
     try {
-        sourceSchema = sourceSchema || getResolverlessSchema({ schemaPath: config.schemaPath });
+        sourceSchema = sourceSchema || getResolverlessSchema();
     } catch (e) {
         console.error('Your schema has errors: ');
         throw e;

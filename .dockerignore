@@ -1,0 +1,18 @@
+data/
+
+#Git
+.git
+.gitignore
+
+# Dev tools
+.vscode/
+.eslintrc
+.prettierrc
+test.sqlite3
+
+# Test directories
+tests/
+mochawesome-report/
+
+# Dependency directories
+node_modules/

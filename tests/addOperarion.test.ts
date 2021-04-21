@@ -18,9 +18,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addQuery(input: {id: "2"}) { id } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { id: ID }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { id: ID }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -51,9 +51,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {id: "1"}) { id } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { book: Book } type Book { id: ID }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -87,9 +87,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {name: "Game of thrones"}) { name } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { book: Book } type Book { name: String }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { book: Book } type Book { name: String }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -123,9 +123,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {named: true }) { named } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { book: Book } type Book { named: Boolean }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { book: Book } type Book { named: Boolean }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -159,9 +159,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2}) { probability } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { book: Book } type Book { probability: Int }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { book: Book } type Book { probability: Int }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -195,9 +195,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2.2}) { probability } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { book: Book } type Book { probability: Float }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { book: Book } type Book { probability: Float }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -233,9 +233,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2.2}) { probability } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { probability: Float }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { books: [Book] } type Book { probability: Float }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -269,9 +269,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {authors: ["1"]}) { authors { name } } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { books: Book } type Book { authors: [Author] } type Author { name: String }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { books: Book } type Book { authors: [Author] } type Author { name: String }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -311,9 +311,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {authors: ["Bob"]}) { authors } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { books: Book } type Book { authors: [String] }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { books: Book } type Book { authors: [String] }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,
@@ -351,9 +351,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {author: "1"}) { author { name } } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema({
-                    typeDefs: `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`,
-                });
+                const resolverlessSchema = getResolverlessSchema(
+                    `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`
+                );
                 const creationResult = await createApp({
                     config,
                     resolverlessSchema,

@@ -6,7 +6,6 @@ import { GraphQLSchema, isObjectType } from 'graphql';
 import { generateTables } from './generateTables';
 import { applyTableConstraints } from './applyTableConstraints';
 import { log } from '../logger';
-import { Config } from '../createApp';
 
 export async function generateDatabase({
     sourceSchema,
@@ -35,7 +34,7 @@ export async function generateDatabase({
         .map(([key]) => key);
     const doesDbAlreadyExist = await knex.schema.hasTable(objectTypeNames[0]);
 
-    if (doesDbAlreadyExist && config.skipDbCreationIfExists) {
+    if (doesDbAlreadyExist && (config.skipDbCreationIfExists ?? true)) {
         (await import('../logger')).log(
             '💀💀💀',
             '\x1b[1m\x1b[31mSKIPPED TABLE CREATION, DB ALREADY EXISTS'

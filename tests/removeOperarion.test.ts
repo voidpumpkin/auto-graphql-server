@@ -17,9 +17,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeQuery() { id } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { id: ID }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { id: ID }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -50,9 +50,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {id: "1"}) { id } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { id: ID }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -90,9 +90,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { name: String }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { name: String }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -130,9 +130,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {readable: true}) { readable } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { readable: Boolean }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { readable: Boolean }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -170,9 +170,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {pages: 5}) { pages } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { pages: Int }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { pages: Int }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -210,9 +210,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {probability: 0.3}) { probability } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { probability: Float }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { probability: Float }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -250,9 +250,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { books: [Book] } type Book { name: String }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { books: [Book] } type Book { name: String }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -291,9 +291,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {author: "1"}) { author { name } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
@@ -334,9 +334,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {authors: ["1"]}) { authors { name } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema({
-                typeDefs: `schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }`,
-            });
+            const resolverlessSchema = getResolverlessSchema(
+                `schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }`
+            );
             const creationResult = await createApp({
                 config,
                 resolverlessSchema,
