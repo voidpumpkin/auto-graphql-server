@@ -1,0 +1,16 @@
+{
+  "graphqlHTTP": {
+    "graphiql": true
+  },
+  "printSql": true,
+  "database": {
+    "client": "mysql2",
+    "version": "8",
+    "connection": {
+      "host": "database",
+      "user": "agsuser",
+      "password": "agspassword",
+      "database": "agsdb"
+    }
+  }
+}
