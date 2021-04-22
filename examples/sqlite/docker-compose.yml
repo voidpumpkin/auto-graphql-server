@@ -1,4 +1,4 @@
-# docker-compose -f ./examples/sqlite/docker-compose.yml -p ags_sqlite up
+# docker compose -f ./examples/sqlite/docker-compose.yml -p ags_sqlite up
 version: '3'
 services:
     server:

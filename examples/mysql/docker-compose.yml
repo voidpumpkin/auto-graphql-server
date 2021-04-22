@@ -1,4 +1,4 @@
-# docker-compose -f ./examples/sqlite/docker-compose.yml -p ags_mysql up
+# docker compose -f ./examples/mysql/docker-compose.yml -p ags_mysql up
 version: '3'
 services:
     server:
