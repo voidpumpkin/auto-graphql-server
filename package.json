@@ -10,7 +10,7 @@
         "test": "mocha --recursive tests/ --extension test.ts --require ts-node/register --ui mocha-cakes-2  --exit --reporter mochawesome",
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "lint": "eslint ./src/**/* --ext .js,.ts --fix",
-        "dev": "ts-node-dev --watch schema.graphql src",
+        "dev": "ts-node-dev --watch data/schema.graphql src",
         "start": "ts-node src"
     },
     "dependencies": {
