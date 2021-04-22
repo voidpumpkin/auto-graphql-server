@@ -1,8 +1,9 @@
 import { GraphQLSchema, isEqualType, isObjectType, GraphQLObjectType } from 'graphql';
 import { getMutationStrings, defaultInputArg } from './getMutationStrings';
+import { mergeSchemas } from '@graphql-tools/merge';
 
-export function getMutationTypeDefs(userDefinedSchema: GraphQLSchema): string {
-    const schemaTypeMap = userDefinedSchema.getTypeMap();
+export function populateSchemaMutation(schema: GraphQLSchema): GraphQLSchema {
+    const schemaTypeMap = schema.getTypeMap();
     let mutationTypeDefs = 'schema { mutation: Mutation } ';
     let mutationFields = '';
 
@@ -11,7 +12,7 @@ export function getMutationTypeDefs(userDefinedSchema: GraphQLSchema): string {
         .map(([, val]) => val as GraphQLObjectType);
 
     namedTypes.map(async (namedType) => {
-        const queryType = userDefinedSchema.getQueryType();
+        const queryType = schema.getQueryType();
         if (!queryType) {
             throw Error('QueryType not defined');
         } else if (isEqualType(namedType, queryType)) {
@@ -28,8 +29,12 @@ export function getMutationTypeDefs(userDefinedSchema: GraphQLSchema): string {
     });
 
     if (!mutationFields) {
-        return '';
+        return schema;
     }
     mutationTypeDefs += `type Mutation { ${mutationFields}} `;
-    return mutationTypeDefs;
+
+    return mergeSchemas({
+        schemas: [schema],
+        typeDefs: mutationTypeDefs,
+    });
 }

@@ -66,13 +66,14 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                                         `__${info.returnType.name}_${inputName}_list`
                                     ).insert({
                                         value,
-                                        [`__${info.returnType.name}_id`]: insertResultIds[0],
+
+                                        [`${info.returnType.name}_${inputName}_id`]: insertResultIds[0],
                                     });
                                 } else {
                                     await knex(listFields[inputName].type.ofType.name)
                                         .where({ id: value })
                                         .update({
-                                            [`__${info.returnType.name}_id`]: insertResultIds[0],
+                                            [`${info.returnType.name}_${inputName}_id`]: insertResultIds[0],
                                         });
                                 }
                             })
@@ -117,7 +118,7 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                             valueList.map(async (value: any) => {
                                 if (isScalarType(listFields[inputName].type.ofType)) {
                                     const tableName = `__${returnTypeName}_${inputName}_list`;
-                                    const relationshipName = `__${returnTypeName}_id`;
+                                    const relationshipName = `${returnTypeName}_${inputName}_id`;
                                     await knex(tableName)
                                         .where({ [relationshipName]: root.id })
                                         .delete();
@@ -129,7 +130,7 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                                     await knex(listFields[inputName].type.ofType.name)
                                         .where({ id: value })
                                         .update({
-                                            [`__${returnTypeName}_id`]: root.id,
+                                            [`${returnTypeName}_${inputName}_id`]: root.id,
                                         });
                                 }
                             })

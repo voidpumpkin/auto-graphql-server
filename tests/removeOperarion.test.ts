@@ -18,7 +18,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         let response: request.Response;
         before(async () => {
             const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { id: ID }`
+                `schema { query: Query } type Query { identification: ID }`
             );
             const creationResult = await createApp({
                 config,
@@ -51,7 +51,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         let response: request.Response;
         before(async () => {
             const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+                `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
             );
             const creationResult = await createApp({
                 config,

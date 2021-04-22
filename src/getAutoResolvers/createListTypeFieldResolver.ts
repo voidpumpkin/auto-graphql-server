@@ -27,7 +27,7 @@ export function createListTypeFieldResolver(
 
             const result = await knex(resultTypeName)
                 .select(...selections)
-                .where(queryWhere ?? { [`__${info.parentType.name}_id`]: root.id });
+                .where(queryWhere ?? { [`${info.parentType.name}_${info.fieldName}_id`]: root.id });
             return result;
         };
     } else if (isScalarType(fieldType.ofType)) {
@@ -41,7 +41,7 @@ export function createListTypeFieldResolver(
 
             const knexResult = await knex(`__${info.parentType.name}_${info.fieldName}_list`)
                 .select('value')
-                .where({ [`__${info.parentType.name}_id`]: root.id });
+                .where({ [`${info.parentType.name}_${info.fieldName}_id`]: root.id });
             return knexResult.map((row) => row.value);
         };
     } else {

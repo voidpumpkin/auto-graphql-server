@@ -1,6 +1,5 @@
 import { GraphQLList } from 'graphql';
 import Knex from 'knex';
-import { buildObjectScalarField } from './buildObjectScalarField';
 import { buildScalarListField } from './buildScalarListField';
 
 export async function buildListFields({
@@ -15,9 +14,8 @@ export async function buildListFields({
 }): Promise<void> {
     await Promise.all(
         Object.entries(listFieldTypeMap).map(async ([name, listType]) => {
-            const foreignKey = `__${objectTypeName}_id`;
+            const foreignKey = `${objectTypeName}_${name}_id`;
             await buildScalarListField(listType, objectTypeName, name, knex, foreignKey);
-            await buildObjectScalarField(listType, knex, objectTypeName, foreignKey);
         })
     );
 }

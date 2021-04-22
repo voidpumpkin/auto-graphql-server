@@ -25,7 +25,4 @@ export async function buildScalarListField(
             tableBuilder,
         });
     });
-    await knex.schema.alterTable(tableName, (table) => {
-        table.foreign(foreignKey).references(`${objectTypeName}.id`);
-    });
 }

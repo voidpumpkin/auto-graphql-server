@@ -19,7 +19,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             let response: request.Response;
             before(async () => {
                 const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { id: ID }`
+                    `schema { query: Query } type Query { identification: ID }`
                 );
                 const creationResult = await createApp({
                     config,
@@ -52,7 +52,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             let response: request.Response;
             before(async () => {
                 const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+                    `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
                 );
                 const creationResult = await createApp({
                     config,
@@ -230,7 +230,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
         Scenario('Schemos Query tipas turi Book sąrašą', async () => {
             let knex: Knex;
             let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-            const query = `mutation { addBook(input: {probability: 2.2}) { probability } }`;
+            const query = `mutation { addBook(input: {probability: 2.2, Query_books_id: "1"}) { probability } }`;
             let response: request.Response;
             before(async () => {
                 const resolverlessSchema = getResolverlessSchema(
@@ -260,7 +260,11 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
             });
             And('duomenų bazėje turėtų būti nauji duomenys', async () => {
-                (await knex('Book').where({ probability: 2.2 }).first()).should.be.ok;
+                (
+                    await knex('Book')
+                        .where({ probability: 2.2, ['Query_books_id']: 1 })
+                        .first()
+                ).should.be.ok;
             });
         });
         Scenario('Schemos Query tipas turi Book tipą kuris turi kitą sąrašą', async () => {
@@ -340,7 +344,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             And('duomenų bazėje turėtų būti nauji duomenys', async () => {
                 (
                     await knex('__Book_authors_list')
-                        .where({ value: 'Bob', ['__Book_id']: 1 })
+                        .where({ value: 'Bob', ['Book_authors_id']: 1 })
                         .first()
                 ).should.be.ok;
             });

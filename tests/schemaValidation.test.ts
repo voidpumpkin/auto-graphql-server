@@ -137,7 +137,9 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getResolverlessSchema(`schema { query: [Book] } type Book { id: ID }`);
+                    getResolverlessSchema(
+                        `schema { query: [Book] } type Book { identification: ID }`
+                    );
             });
             Then(
                 'turi išmesti validavimo klaidą, nes tik objiekto tipas yra leidžiamas query esybei ',

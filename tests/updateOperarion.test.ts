@@ -55,7 +55,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         let response: request.Response;
         before(async () => {
             const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+                `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
             );
             const creationResult = await createApp({
                 config,
@@ -103,8 +103,11 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             });
             app = creationResult.app;
             knex = creationResult.knex;
-            await knex('__Query_bookNames_list').insert({ ['__Query_id']: 1, value: 'waka waka' });
-            await knex('__Query_bookNames_list').insert({ ['__Query_id']: 1, value: 'eh eh' });
+            await knex('__Query_bookNames_list').insert({
+                Query_bookNames_id: 1,
+                value: 'waka waka',
+            });
+            await knex('__Query_bookNames_list').insert({ Query_bookNames_id: 1, value: 'eh eh' });
         });
         Given(`2 Book jau yra duomenų bazėje"`, async () => {
             (await knex('__Query_bookNames_list').where({ id: 1 }).first()).should.be.ok;
@@ -126,14 +129,18 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             });
         });
         And('duomenų bazėje turėtų būti atnaujinti duomenys', async () => {
-            (await knex('__Query_bookNames_list').where({ ['__Query_id']: 1, value: 'waka waka' }))
+            (
+                await knex('__Query_bookNames_list').where({
+                    Query_bookNames_id: 1,
+                    value: 'waka waka',
+                })
+            ).length.should.be.not.ok;
+            (await knex('__Query_bookNames_list').where({ Query_bookNames_id: 1, value: 'eh eh' }))
                 .length.should.be.not.ok;
-            (await knex('__Query_bookNames_list').where({ ['__Query_id']: 1, value: 'eh eh' }))
-                .length.should.be.not.ok;
-            (await knex('__Query_bookNames_list').where({ ['__Query_id']: 1, value: 'bob' })).length
-                .should.be.ok;
-            (await knex('__Query_bookNames_list').where({ ['__Query_id']: 1, value: 'sam' })).length
-                .should.be.ok;
+            (await knex('__Query_bookNames_list').where({ Query_bookNames_id: 1, value: 'bob' }))
+                .length.should.be.ok;
+            (await knex('__Query_bookNames_list').where({ Query_bookNames_id: 1, value: 'sam' }))
+                .length.should.be.ok;
         });
     });
     Scenario('Atnaujinti Query books ryšius', async () => {
@@ -143,7 +150,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         let response: request.Response;
         before(async () => {
             const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { books: [Book] } type Book { id: ID }`
+                `schema { query: Query } type Query { books: [Book] } type Book { identification: ID }`
             );
             const creationResult = await createApp({
                 config,
@@ -174,7 +181,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             });
         });
         And('duomenų bazėje turėtų būti atnaujinti duomenys', async () => {
-            (await knex('Book').where({ ['__Query_id']: 1 })).length.should.be.equal(2);
+            (await knex('Book').where({ Query_books_id: 1 })).length.should.be.equal(2);
         });
     });
 });

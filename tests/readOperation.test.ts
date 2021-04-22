@@ -19,7 +19,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             let response: request.Response;
             before(async () => {
                 const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { id: ID }`
+                    `schema { query: Query } type Query { identification: ID }`
                 );
                 const creationResult = await createApp({ config, resolverlessSchema });
                 app = creationResult.app;
@@ -333,7 +333,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
 
             before(async () => {
                 const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+                    `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
                 );
                 const creationResult = await createApp({ config, resolverlessSchema });
                 app = creationResult.app;
@@ -413,7 +413,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
 
             before(async () => {
                 const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { id: ID }`
+                    `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
                 );
                 const creationResult = await createApp({ config, resolverlessSchema });
                 app = creationResult.app;
@@ -532,8 +532,8 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 query.should.exist;
             });
             And(`duomenų bazėje yra 2 Query id`, async () => {
-                await knex('__Query_ids_list').insert({ value: 1, __Query_id: 1 });
-                await knex('__Query_ids_list').insert({ value: 2, __Query_id: 1 });
+                await knex('__Query_ids_list').insert({ value: 1, Query_ids_id: 1 });
+                await knex('__Query_ids_list').insert({ value: 2, Query_ids_id: 1 });
             });
             When('atsakymas gražinamas', async () => {
                 response = await request(app.listen())
@@ -556,7 +556,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
 
             before(async () => {
                 const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { books: [Book] } type Book { id: ID }`
+                    `schema { query: Query } type Query { books: [Book] } type Book { identification: ID }`
                 );
                 const creationResult = await createApp({ config, resolverlessSchema });
                 app = creationResult.app;
@@ -567,8 +567,8 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 query.should.exist;
             });
             And(`duomenų bazėje yra 2 Book sujungti su Query`, async () => {
-                await knex('Book').insert({ __Query_id: 1 });
-                await knex('Book').insert({ __Query_id: 1 });
+                await knex('Book').insert({ Query_books_id: 1 });
+                await knex('Book').insert({ Query_books_id: 1 });
             });
             When('atsakymas gražinamas', async () => {
                 response = await request(app.listen())
@@ -610,8 +610,8 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 And(
                     `2 Book kurios turi po 1 Author ir yra prijuntos prie Query objiekto`,
                     async () => {
-                        await knex('Book').insert({ __Query_id: 1, author: 1 });
-                        await knex('Book').insert({ __Query_id: 1, author: 2 });
+                        await knex('Book').insert({ Query_books_id: 1, author: 1 });
+                        await knex('Book').insert({ Query_books_id: 1, author: 2 });
                     }
                 );
                 When('atsakymas gražinamas', async () => {
@@ -651,14 +651,14 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     query.should.exist;
                 });
                 And(`duomenų bazėje yra 2 Book sujungtos su Query`, async () => {
-                    await knex('Book').insert({ __Query_id: 1 });
-                    await knex('Book').insert({ __Query_id: 1 });
+                    await knex('Book').insert({ Query_books_id: 1 });
+                    await knex('Book').insert({ Query_books_id: 1 });
                 });
                 And(`4 Author, po 2 sujunti su skirtinga Book`, async () => {
-                    await knex('Author').insert({ name: 'Sam', __Book_id: 2 });
-                    await knex('Author').insert({ name: 'Bob', __Book_id: 2 });
-                    await knex('Author').insert({ name: 'Fab', __Book_id: 1 });
-                    await knex('Author').insert({ name: 'Holoman', __Book_id: 1 });
+                    await knex('Author').insert({ name: 'Sam', Book_authors_id: 2 });
+                    await knex('Author').insert({ name: 'Bob', Book_authors_id: 2 });
+                    await knex('Author').insert({ name: 'Fab', Book_authors_id: 1 });
+                    await knex('Author').insert({ name: 'Holoman', Book_authors_id: 1 });
                 });
                 When('atsakymas gražinamas', async () => {
                     response = await request(app.listen())
@@ -704,8 +704,8 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     await knex('Query').where({ id: 1 }).update({ book: 1 });
                 });
                 And(`2 Author sujunti su Book`, async () => {
-                    await knex('Author').insert({ name: 'Fab', __Book_id: 1 });
-                    await knex('Author').insert({ name: 'Holoman', __Book_id: 1 });
+                    await knex('Author').insert({ name: 'Fab', Book_authors_id: 1 });
+                    await knex('Author').insert({ name: 'Holoman', Book_authors_id: 1 });
                 });
                 When('atsakymas gražinamas', async () => {
                     response = await request(app.listen())
@@ -777,8 +777,8 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     query.should.exist;
                 });
                 And(`duomenų bazėje yra 2 Book sujungti su Query`, async () => {
-                    await knex('Book').insert({ __Query_id: 1 });
-                    await knex('Book').insert({ __Query_id: 1 });
+                    await knex('Book').insert({ Query_books_id: 1 });
+                    await knex('Book').insert({ Query_books_id: 1 });
                 });
                 When('atsakymas gražinamas', async () => {
                     response = await request(app.listen())
@@ -847,8 +847,8 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     query.should.exist;
                 });
                 And(`duomenų bazėje yra 2 Book sujungtos su Query`, async () => {
-                    await knex('Book').insert({ __Query_id: 1 });
-                    await knex('Book').insert({ __Query_id: 1 });
+                    await knex('Book').insert({ Query_books_id: 1 });
+                    await knex('Book').insert({ Query_books_id: 1 });
                 });
                 When('atsakymas gražinamas', async () => {
                     response = await request(app.listen())
