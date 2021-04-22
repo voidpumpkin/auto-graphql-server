@@ -106,9 +106,14 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                     listFields,
                     nonListFields
                 );
+                const queryWhere = isQueryType ? { id: root.id } : args.filter;
+
+                if (!Object.keys(queryWhere).length) {
+                    throw Error('No filters provided');
+                }
 
                 if (Object.keys(nonListInputs).length) {
-                    await knex(returnTypeName).where({ id: root.id }).update(nonListInputs);
+                    await knex(returnTypeName).where(queryWhere).update(nonListInputs);
                 }
 
                 await Promise.all(
@@ -138,7 +143,6 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                     )
                 );
 
-                const queryWhere = isQueryType ? { id: root.id } : args.filter;
                 const returnResolver = createListTypeFieldResolver(
                     knex,
                     info.returnType,
@@ -160,6 +164,10 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                     args.filter
                 );
                 const results = await returnResolver({}, undefined, undefined, info);
+
+                if (!Object.keys(args.filter).length) {
+                    throw Error('No filters provided');
+                }
 
                 await knex(returnTypeName).where(args.filter).delete();
 

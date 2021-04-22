@@ -1,12 +1,19 @@
-import { isScalarType, isObjectType, isListType, GraphQLList } from 'graphql';
+import {
+    isScalarType,
+    isObjectType,
+    isListType,
+    GraphQLList,
+    GraphQLObjectType,
+    GraphQLScalarType,
+} from 'graphql';
 import Knex from 'knex';
 import { TypeMap } from '@graphql-tools/utils';
 
-import { buildObjectFieldTables } from './buildObjectFieldTables';
-import { buildScalarFieldTables } from './buildScalarFieldTables';
-import { buildListFields } from './buildListFields';
+import { buildObjectFields } from './buildObjectFields';
+import { buildScalarFields } from './buildScalarFields';
 import { recursivelyGetAllFieldTypeEntries } from './recursivelyGetAllFieldTypeEntries';
-import { updateListFields } from './updateListFields';
+import { updateForeignKeyConstraints } from './updateForeignKeyConstraints';
+import { buildListScalarFieldTables } from './buildListScalarFieldTables';
 
 export async function generateTables({
     objectTypeNames,
@@ -23,62 +30,80 @@ export async function generateTables({
             throw Error('Not object type');
         }
         const fieldTypeEntries = recursivelyGetAllFieldTypeEntries(objectType);
-        const scalarFieldTypeNameMap: Record<string, string> = {};
-        const objectFieldNames: string[] = [];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const listFieldTypeMap: Record<string, GraphQLList<any>> = {};
+        const scalarFieldTypeMap: Record<string, GraphQLScalarType> = {};
+        const objectFieldTypeMap: Record<string, GraphQLObjectType> = {};
+        const listScalarFieldTypeMap: Record<string, GraphQLScalarType> = {};
+        const listObjectFieldTypeMap: Record<string, GraphQLObjectType> = {};
+
         for (const [key, type] of fieldTypeEntries) {
             if (isScalarType(type) && key !== 'id') {
-                scalarFieldTypeNameMap[key] = type.name;
+                scalarFieldTypeMap[key] = type;
             } else if (isObjectType(type)) {
-                objectFieldNames.push(key);
+                objectFieldTypeMap[key] = type;
             } else if (isListType(type)) {
-                listFieldTypeMap[key] = type.ofType;
+                if (isScalarType(type.ofType)) {
+                    listScalarFieldTypeMap[key] = type.ofType;
+                } else if (isObjectType(type.ofType)) {
+                    listObjectFieldTypeMap[key] = type.ofType;
+                }
             }
         }
         return {
-            listFieldTypeMap,
-            scalarFieldTypeNameMap,
-            objectFieldNames,
+            scalarFieldTypeMap,
+            objectFieldTypeMap,
+            listScalarFieldTypeMap,
+            listObjectFieldTypeMap,
             objectType,
         };
     });
 
     await Promise.all(
         prepedDataList.map(
-            async ({ listFieldTypeMap, scalarFieldTypeNameMap, objectFieldNames, objectType }) => {
-                let tableBuildMethod: 'alterTable' | 'createTable' = 'createTable';
-                if (await knex.schema.hasTable(objectType.name)) {
-                    tableBuildMethod = 'alterTable';
-                }
+            async ({
+                scalarFieldTypeMap,
+                objectFieldTypeMap,
+                listScalarFieldTypeMap,
+                objectType,
+            }) => {
                 if (
-                    !!Object.keys(scalarFieldTypeNameMap).length &&
-                    !!objectFieldNames.length &&
-                    !!Object.keys(listFieldTypeMap).length
+                    !!Object.keys(scalarFieldTypeMap).length &&
+                    !!Object.keys(objectFieldTypeMap).length &&
+                    !!Object.keys(listScalarFieldTypeMap).length
                 ) {
                     return;
                 }
-                await knex.schema[tableBuildMethod](objectType.name, (tableBuilder) => {
+                await knex.schema.createTable(objectType.name, (tableBuilder) => {
                     tableBuilder.increments('id').unsigned();
-                    buildScalarFieldTables({ scalarFieldTypeNameMap, tableBuilder });
-                    buildObjectFieldTables({ objectFieldNames, tableBuilder });
+                    buildScalarFields({ scalarFieldTypeMap, tableBuilder });
+                    buildObjectFields({ objectFieldTypeMap, tableBuilder });
                 });
-                await buildListFields({ listFieldTypeMap, objectTypeName: objectType.name, knex });
+                await buildListScalarFieldTables(listScalarFieldTypeMap, objectType, knex);
             }
         )
     );
 
     await Promise.all(
         prepedDataList.map(
-            async ({ listFieldTypeMap, scalarFieldTypeNameMap, objectFieldNames, objectType }) => {
+            async ({
+                objectFieldTypeMap,
+                listScalarFieldTypeMap,
+                listObjectFieldTypeMap,
+                objectType,
+            }) => {
                 if (
-                    !!Object.keys(scalarFieldTypeNameMap).length &&
-                    !!objectFieldNames.length &&
-                    !!Object.keys(listFieldTypeMap).length
+                    !!Object.keys(objectFieldTypeMap).length &&
+                    !!Object.keys(listScalarFieldTypeMap).length &&
+                    !!Object.keys(listObjectFieldTypeMap).length
                 ) {
                     return;
                 }
-                await updateListFields(listFieldTypeMap, objectType, knex);
+                await updateForeignKeyConstraints({
+                    objectFieldTypeMap,
+                    listScalarFieldTypeMap,
+                    listObjectFieldTypeMap,
+                    objectType,
+                    knex,
+                });
             }
         )
     );

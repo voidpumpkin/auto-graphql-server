@@ -6,7 +6,6 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import { getResolverlessSchema } from '../src/getResolverlessSchema/getResolverlessSchema';
 import config from './testConfig.json';
 
 should();
@@ -18,12 +17,9 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addQuery(input: {id: "2"}) { id } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { identification: ID }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs: 'schema { query: Query } type Query { identification: ID }',
                 });
                 app = creationResult.app;
             });
@@ -51,12 +47,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {id: "1"}) { id } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { identification: ID }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -87,12 +81,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {name: "Game of thrones"}) { name } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { name: String }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { name: String }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -123,12 +115,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {named: true }) { named } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { named: Boolean }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { named: Boolean }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -159,12 +149,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2}) { probability } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { probability: Int }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { probability: Int }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -195,12 +183,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2.2}) { probability } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { probability: Float }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { probability: Float }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -233,12 +219,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2.2, Query_books_id: "1"}) { probability } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { books: [Book] } type Book { probability: Float }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { books: [Book] } type Book { probability: Float }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -273,12 +257,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {authors: ["1"]}) { authors { name } } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { books: Book } type Book { authors: [Author] } type Author { name: String }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { books: Book } type Book { authors: [Author] } type Author { name: String }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -315,12 +297,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {authors: ["Bob"]}) { authors } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { books: Book } type Book { authors: [String] }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { books: Book } type Book { authors: [String] }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
@@ -355,12 +335,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {author: "1"}) { author { name } } }`;
             let response: request.Response;
             before(async () => {
-                const resolverlessSchema = getResolverlessSchema(
-                    `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`
-                );
                 const creationResult = await createApp({
                     config,
-                    resolverlessSchema,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;

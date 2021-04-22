@@ -12,17 +12,14 @@ import { insertRootQueryObject } from './insertRootQueryObject';
 
 export async function createApp({
     config,
-    resolverlessSchema: sourceSchema,
+    typeDefs,
 }: {
-    config: Config | undefined;
-    resolverlessSchema?: GraphQLSchema;
+    config: Config;
+    typeDefs: string;
 }): Promise<{ app: Koa<Koa.DefaultState, Koa.DefaultContext>; knex: Knex }> {
-    if (!config) {
-        throw Error('missing config');
-    }
-
+    let sourceSchema: GraphQLSchema;
     try {
-        sourceSchema = sourceSchema || getResolverlessSchema();
+        sourceSchema = getResolverlessSchema(typeDefs);
     } catch (e) {
         console.error('Your schema has errors: ');
         throw e;

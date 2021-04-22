@@ -4,7 +4,6 @@ import Knex from 'knex';
 import { GraphQLSchema, isObjectType } from 'graphql';
 
 import { generateTables } from './generateTables';
-import { applyTableConstraints } from './applyTableConstraints';
 import { log } from '../logger';
 
 export async function generateDatabase({
@@ -57,6 +56,5 @@ export async function generateDatabase({
     }
 
     await generateTables({ objectTypeNames, knex, schemaTypeMap });
-    await applyTableConstraints({ objectTypeNames, schemaTypeMap, knex });
     return knex;
 }

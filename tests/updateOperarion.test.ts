@@ -6,7 +6,6 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import { getResolverlessSchema } from '../src/getResolverlessSchema/getResolverlessSchema';
 import config from './testConfig.json';
 
 should();
@@ -18,12 +17,9 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {typeCount: 3}) { typeCount } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { typeCount: Int }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs: 'schema { query: Query } type Query { typeCount: Int }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -54,12 +50,10 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {book: "1"}) { book { id } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { identification: ID }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -94,12 +88,9 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {bookNames: ["bob","sam"]}) { bookNames } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { bookNames: [String] }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs: 'schema { query: Query } type Query { bookNames: [String] }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -149,12 +140,10 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {books: ["1","2"]}) { books { id } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { books: [Book] } type Book { identification: ID }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { books: [Book] } type Book { identification: ID }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -182,6 +171,83 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         });
         And('duomenų bazėje turėtų būti atnaujinti duomenys', async () => {
             (await knex('Book').where({ Query_books_id: 1 })).length.should.be.equal(2);
+        });
+    });
+    Scenario('Atnaujinti Book su Query ryšį', async () => {
+        let knex: Knex;
+        let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+        const query = `mutation { updateBook(input: {Query_books_id: "1"}) { id } }`;
+        let response: request.Response;
+        before(async () => {
+            const creationResult = await createApp({
+                config,
+                typeDefs:
+                    'schema { query: Query } type Query { books: [Book] } type Book { identification: ID }',
+            });
+            app = creationResult.app;
+            knex = creationResult.knex;
+            await knex('Book').insert({});
+        });
+        Given(`Book su id 1 jau yra duomenų bazėje"`, async () => {
+            const book = await knex('Book').where({ id: 1 }).first();
+            book.should.be.ok;
+        });
+        And(`užklausai "${query}"`, () => {
+            query.should.exist;
+        });
+        When('atsakymas gražinamas', async () => {
+            response = await request(app.listen())
+                .post(`/`)
+                .set('Accept', 'application/json')
+                .send({ query });
+            response.status.should.be.equal(200);
+        });
+        Then(
+            'atsakymo kūnas turėtų turėti klaidų nes nebuvo duoti filtrai ką atnaujinti',
+            async () => {
+                response.body.errors.should.be.ok;
+            }
+        );
+        And('duomenų bazėje turėtų nebūti atnaujinti duomenys', async () => {
+            (await knex('Book').where({ Query_books_id: 1 })).length.should.be.not.ok;
+        });
+    });
+    Scenario('Atnaujinti Book su Query ryšį pagal Book identification', async () => {
+        let knex: Knex;
+        let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+        const query = `mutation { updateBook(filter: {identification: "6"}, input: {Query_books_id: "1"}) { id } }`;
+        let response: request.Response;
+        before(async () => {
+            const creationResult = await createApp({
+                config,
+                typeDefs:
+                    'schema { query: Query } type Query { books: [Book] } type Book { identification: ID }',
+            });
+            app = creationResult.app;
+            knex = creationResult.knex;
+            await knex('Book').insert({ identification: 6 });
+        });
+        Given(`Book su id 1 jau yra duomenų bazėje"`, async () => {
+            const book = await knex('Book').where({ id: 1, identification: 6 }).first();
+            book.should.be.ok;
+        });
+        And(`užklausai "${query}"`, () => {
+            query.should.exist;
+        });
+        When('atsakymas gražinamas', async () => {
+            response = await request(app.listen())
+                .post(`/`)
+                .set('Accept', 'application/json')
+                .send({ query });
+            response.status.should.be.equal(200);
+        });
+        Then('atsakymo kūnas turėtų turėti teisingą book', async () => {
+            response.body.should.deep.equal({
+                data: { updateBook: [{ id: '1' }] },
+            });
+        });
+        And('duomenų bazėje turėtų būti atnaujinti duomenys', async () => {
+            (await knex('Book').where({ Query_books_id: 1 })).length.should.be.ok;
         });
     });
 });

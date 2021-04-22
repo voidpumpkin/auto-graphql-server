@@ -6,7 +6,6 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import { getResolverlessSchema } from '../src/getResolverlessSchema/getResolverlessSchema';
 import config from './testConfig.json';
 
 should();
@@ -17,12 +16,9 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeQuery() { id } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { identification: ID }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs: 'schema { query: Query } type Query { identification: ID }',
             });
             app = creationResult.app;
         });
@@ -50,12 +46,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {id: "1"}) { id } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { identification: ID }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { identification: ID }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -90,12 +84,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { name: String }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { name: String }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -130,12 +122,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {readable: true}) { readable } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { readable: Boolean }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { readable: Boolean }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -170,12 +160,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {pages: 5}) { pages } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { pages: Int }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { pages: Int }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -210,12 +198,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {probability: 0.3}) { probability } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { probability: Float }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { probability: Float }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -250,12 +236,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { books: [Book] } type Book { name: String }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { books: [Book] } type Book { name: String }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -291,12 +275,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {author: "1"}) { author { name } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
@@ -334,12 +316,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {authors: ["1"]}) { authors { name } } }`;
         let response: request.Response;
         before(async () => {
-            const resolverlessSchema = getResolverlessSchema(
-                `schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }`
-            );
             const creationResult = await createApp({
                 config,
-                resolverlessSchema,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }',
             });
             app = creationResult.app;
         });

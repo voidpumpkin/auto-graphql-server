@@ -1,22 +1,23 @@
 import Knex from 'knex';
 import { getKnexColumnType } from './graphqlScalarToKnexTypeMap';
 import { GRAPHQL_ID } from '../graphqlConstants';
+import { GraphQLScalarType } from 'graphql';
 
-export function buildScalarFieldTables({
-    scalarFieldTypeNameMap,
+export function buildScalarFields({
+    scalarFieldTypeMap,
     tableBuilder,
 }: {
-    scalarFieldTypeNameMap: Record<string, string>;
+    scalarFieldTypeMap: Record<string, GraphQLScalarType>;
     tableBuilder: Knex.CreateTableBuilder;
 }): void {
-    const scalarFieldTypeNameMapEntries = Object.entries(scalarFieldTypeNameMap);
+    const scalarFieldTypeNameMapEntries = Object.entries(scalarFieldTypeMap);
     if (scalarFieldTypeNameMapEntries.length) {
         scalarFieldTypeNameMapEntries.forEach(([fieldName, fieldType]) => {
-            if (fieldType === GRAPHQL_ID) {
+            if (fieldType.name === GRAPHQL_ID) {
                 tableBuilder.integer(fieldName).unsigned();
                 return;
             }
-            tableBuilder[getKnexColumnType(fieldType)](fieldName);
+            tableBuilder[getKnexColumnType(fieldType.name)](fieldName);
         });
     }
 }

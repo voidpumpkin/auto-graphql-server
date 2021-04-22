@@ -8,11 +8,7 @@ import { validateAutomaticlyGenerated } from './validateAutomaticlyGenerated';
 import { populateSchemaMutation } from './populateSchemaMutation';
 import { populateSchemaWithIdFields } from './populateSchemaWithIdFields';
 
-export function getResolverlessSchema(typeDefs?: string): GraphQLSchema {
-    if (!typeDefs) {
-        typeDefs = fs.readFileSync('./data/schema.graphql', 'utf8');
-    }
-
+export function getResolverlessSchema(typeDefs: string): GraphQLSchema {
     const userDefinedSchema = makeExecutableSchema({ typeDefs });
 
     //Validations before auto added fields

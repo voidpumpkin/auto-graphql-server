@@ -1,26 +1,22 @@
-import { isScalarType, GraphQLList } from 'graphql';
+import { GraphQLScalarType, GraphQLID } from 'graphql';
 import Knex from 'knex';
-import { GRAPHQL_ID } from '../graphqlConstants';
-import { buildScalarFieldTables } from './buildScalarFieldTables';
+import { buildScalarFields } from './buildScalarFields';
 
 export async function buildScalarListField(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    listType: GraphQLList<any>,
+    listType: GraphQLScalarType,
     objectTypeName: string,
     name: string,
-    knex: Knex,
-    foreignKey: string
+    knex: Knex
 ): Promise<void> {
-    if (!isScalarType(listType)) {
-        return;
-    }
+    const foreignKey = `${objectTypeName}_${name}_id`;
     const tableName = `__${objectTypeName}_${name}_list`;
     await knex.schema.createTable(tableName, (tableBuilder) => {
         tableBuilder.increments('id').unsigned();
-        buildScalarFieldTables({
-            scalarFieldTypeNameMap: {
-                value: listType.name,
-                [foreignKey]: GRAPHQL_ID,
+        buildScalarFields({
+            scalarFieldTypeMap: {
+                value: listType,
+                [foreignKey]: GraphQLID,
             },
             tableBuilder,
         });
