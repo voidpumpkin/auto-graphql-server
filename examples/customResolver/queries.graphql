@@ -4,6 +4,10 @@ mutation addBook {
     }
 }
 
+mutation letsParty {
+    party
+}
+
 query customBooks {
     books(author: "sam") {
         id

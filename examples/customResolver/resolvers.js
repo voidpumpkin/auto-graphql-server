@@ -6,4 +6,7 @@ module.exports = {
             };
         },
     },
+    Mutation: {
+        party: () => () => '🥳🥳🥳',
+    },
 };
