@@ -11,7 +11,7 @@ import config from './testConfig.json';
 should();
 
 Feature('💼Klieto duoti išsprendėjai', async () => {
-    Scenario('Kliento išsprendėjas typeCount', async () => {
+    Scenario('Kliento išsprendėjas Query typeCount', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
         const query = `query { typeCount }`;
@@ -50,6 +50,39 @@ Feature('💼Klieto duoti išsprendėjai', async () => {
         });
         And('duomenų bazėje turėtų būti išlikę seni duomenys', async () => {
             (await knex('Query').where({ typeCount: 3 })).length.should.be.ok;
+        });
+    });
+    Scenario('Kliento išsprendėjas Mutation party', async () => {
+        let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+        const query = `mutation { party }`;
+        let response: request.Response;
+        before(async () => {
+            const creationResult = await createApp({
+                config,
+                typeDefs: 'type Query { typeCount: Int } type Mutation { party: String }',
+                customResolverBuilderMap: {
+                    Mutation: {
+                        party: () => () => '🎉',
+                    },
+                },
+            });
+            app = creationResult.app;
+        });
+
+        Given(`užklausai "${query}"`, () => {
+            query.should.exist;
+        });
+        When('atsakymas gražinamas', async () => {
+            response = await request(app.listen())
+                .post(`/`)
+                .set('Accept', 'application/json')
+                .send({ query });
+            response.status.should.be.equal(200);
+        });
+        Then('atsakymo kūnas turėtų turėti teisingą party', async () => {
+            response.body.should.deep.equal({
+                data: { party: '🎉' },
+            });
         });
     });
 });

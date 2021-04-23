@@ -18,19 +18,6 @@ Feature('🛑Schemos validacija', async () => {
                 }
             );
         });
-        Scenario('Nevalidus pavadinimas mutation', async () => {
-            let wrapedFunction: () => void;
-            When('validuojama schema', async () => {
-                wrapedFunction = () =>
-                    getResolverlessSchema(`schema { mutation: Book } type Book { name: String }`);
-            });
-            Then(
-                'turi mesti validavimo klaidą, nes mutation pavadinimas yra automatiškai sugeneruojamas',
-                async () => {
-                    expect(wrapedFunction).to.throw();
-                }
-            );
-        });
         Scenario('Validus pavadinimas subscription', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
@@ -148,20 +135,5 @@ Feature('🛑Schemos validacija', async () => {
                 }
             );
         });
-    });
-    Scenario('Schema turi tipą Mutation', async () => {
-        let wrapedFunction: () => void;
-        When('validuojama schema', async () => {
-            wrapedFunction = () =>
-                getResolverlessSchema(
-                    `schema { query: Book } type Book { mut: Mutation } type Mutation { book: Book }`
-                );
-        });
-        Then(
-            'turi mesti validavimo klaidą, nes Mutation tipas yra automatiškia generuojamas',
-            async () => {
-                expect(wrapedFunction).to.throw();
-            }
-        );
     });
 });
