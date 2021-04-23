@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
 import { GraphQLSchema } from 'graphql';

@@ -2,7 +2,6 @@ import {
     isScalarType,
     isObjectType,
     isListType,
-    GraphQLList,
     GraphQLObjectType,
     GraphQLScalarType,
 } from 'graphql';

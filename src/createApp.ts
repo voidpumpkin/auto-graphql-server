@@ -1,21 +1,22 @@
 import Koa from 'koa';
 import mount from 'koa-mount';
 import graphqlHTTP from 'koa-graphql';
-import { addResolversToSchema } from '@graphql-tools/schema';
 import { GraphQLSchema } from 'graphql';
 import Knex from 'knex';
 
 import { getResolverlessSchema } from './getResolverlessSchema/getResolverlessSchema';
-import { getAutoResolvers } from './getAutoResolvers/getAutoResolvers';
+import { populateSchemaWithResolvers } from './populateSchemaWithResolvers/populateSchemaWithResolvers';
 import { generateDatabase } from './generateDatabase/generateDatabase';
 import { insertRootQueryObject } from './insertRootQueryObject';
 
 export async function createApp({
     config,
     typeDefs,
+    customResolverBuilderMap,
 }: {
     config: Config;
     typeDefs: string;
+    customResolverBuilderMap?: CustomResolverBuilderMap;
 }): Promise<{ app: Koa<Koa.DefaultState, Koa.DefaultContext>; knex: Knex }> {
     let sourceSchema: GraphQLSchema;
     try {
@@ -37,19 +38,13 @@ export async function createApp({
         await insertRootQueryObject(sourceSchema, knex);
     } catch (e) {
         console.error('Error happened while inserting root objects into database');
-    }
-
-    let autoResolvers;
-    try {
-        autoResolvers = getAutoResolvers({ sourceSchema, knex });
-    } catch (e) {
-        console.error('Error happened while generating resolvers: ');
         throw e;
     }
 
-    const schema = addResolversToSchema({
+    const schema = populateSchemaWithResolvers({
         schema: sourceSchema,
-        resolvers: autoResolvers,
+        knex,
+        customResolverBuilderMap,
     });
 
     const app = new Koa();

@@ -1,0 +1,55 @@
+import request from 'supertest';
+import { should } from 'chai';
+import 'mocha-cakes-2';
+
+import Knex from 'knex';
+import Koa from 'koa';
+
+import { createApp } from '../src/createApp';
+import config from './testConfig.json';
+
+should();
+
+Feature('💼Klieto duoti išsprendėjai', async () => {
+    Scenario('Kliento išsprendėjas typeCount', async () => {
+        let knex: Knex;
+        let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+        const query = `query { typeCount }`;
+        let response: request.Response;
+        before(async () => {
+            const creationResult = await createApp({
+                config,
+                typeDefs: 'schema { query: Query } type Query { typeCount: Int }',
+                customResolverBuilderMap: {
+                    Query: {
+                        typeCount: (knex: Knex) => async () =>
+                            (await knex('Query').select('typeCount').where({ id: 1 }).first())
+                                .typeCount * 3,
+                    },
+                },
+            });
+            app = creationResult.app;
+            knex = creationResult.knex;
+            await knex('Query').where({ id: 1 }).update({ typeCount: 3 });
+        });
+
+        Given(`užklausai "${query}"`, () => {
+            query.should.exist;
+        });
+        When('atsakymas gražinamas', async () => {
+            response = await request(app.listen())
+                .post(`/`)
+                .set('Accept', 'application/json')
+                .send({ query });
+            response.status.should.be.equal(200);
+        });
+        Then('atsakymo kūnas turėtų turėti typeCount padaugintą iš 3', async () => {
+            response.body.should.deep.equal({
+                data: { typeCount: 9 },
+            });
+        });
+        And('duomenų bazėje turėtų būti išlikę seni duomenys', async () => {
+            (await knex('Query').where({ typeCount: 3 })).length.should.be.ok;
+        });
+    });
+});
