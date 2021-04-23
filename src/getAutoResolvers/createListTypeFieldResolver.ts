@@ -8,7 +8,8 @@ export function createListTypeFieldResolver(
     knex: Knex,
     fieldType: GraphQLList<GraphQLType>,
     queryTypeName: string,
-    queryWhere?: AnyRecord
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    queryFn?: (tableName: string, selections: string[]) => Promise<any[]>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): IFieldResolver<any, any, any> {
     if (isObjectType(fieldType.ofType)) {
@@ -25,9 +26,14 @@ export function createListTypeFieldResolver(
 
             const selections = getSelections(info, resultTypeFields);
 
-            const result = await knex(resultTypeName)
-                .select(...selections)
-                .where(queryWhere ?? { [`${info.parentType.name}_${info.fieldName}_id`]: root.id });
+            let result;
+            if (queryFn) {
+                result = await queryFn(resultTypeName, selections);
+            } else {
+                result = await knex(resultTypeName)
+                    .select(...selections)
+                    .where({ [`${info.parentType.name}_${info.fieldName}_id`]: root.id });
+            }
             return result;
         };
     } else if (isScalarType(fieldType.ofType)) {

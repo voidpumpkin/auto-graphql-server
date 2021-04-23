@@ -112,8 +112,11 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                     throw Error('No filters provided');
                 }
 
+                const queryResults = await knex(returnTypeName).where(queryWhere).select('id');
+                const updatingRowIds = queryResults.map((e) => e.id);
+
                 if (Object.keys(nonListInputs).length) {
-                    await knex(returnTypeName).where(queryWhere).update(nonListInputs);
+                    await knex(returnTypeName).update(nonListInputs).whereIn('id', updatingRowIds);
                 }
 
                 await Promise.all(
@@ -147,7 +150,10 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                     knex,
                     info.returnType,
                     queryTypeName,
-                    queryWhere
+                    async (tableName, selections) =>
+                        await knex(tableName)
+                            .select(...selections)
+                            .whereIn('id', updatingRowIds)
                 );
                 const results = await returnResolver(root, undefined, undefined, info);
 
@@ -161,7 +167,10 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                     knex,
                     info.returnType,
                     queryTypeName,
-                    args.filter
+                    async (tableName, selections) =>
+                        await knex(tableName)
+                            .select(...selections)
+                            .where(args.filter)
                 );
                 const results = await returnResolver({}, undefined, undefined, info);
 
