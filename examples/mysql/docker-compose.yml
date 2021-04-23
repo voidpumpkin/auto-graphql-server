@@ -1,5 +1,5 @@
-# docker compose -f ./examples/mysql/docker-compose.yml -p ags_mysql up
-# docker compose -f ./examples/mysql/docker-compose.yml -p ags_mysql down --rmi local
+# docker-compose -f ./examples/mysql/docker-compose.yml -p ags_mysql up
+# docker-compose -f ./examples/mysql/docker-compose.yml -p ags_mysql down --rmi local
 version: '3'
 services:
     server:
@@ -7,7 +7,7 @@ services:
         depends_on:
             - database
         ports:
-            - '3002:3001'
+            - '3001:3001'
         volumes:
             - data:/app/data
         deploy:

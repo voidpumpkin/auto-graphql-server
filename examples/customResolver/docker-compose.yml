@@ -1,0 +1,13 @@
+# docker-compose -f ./examples/customResolver/docker-compose.yml -p ags_customresolver up
+# docker-compose -f ./examples/customResolver/docker-compose.yml -p ags_customresolver down --rmi local
+version: '3'
+services:
+    server:
+        build: ../..
+        ports:
+            - '3001:3001'
+        volumes:
+            - data:/app/data
+        container_name: ags_customresolver_server
+volumes:
+    data:

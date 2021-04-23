@@ -1,0 +1,11 @@
+mutation addBook {
+    addBook(input: { author: "sam" }) {
+        id
+    }
+}
+
+query customBooks {
+    books(author: "sam") {
+        id
+    }
+}

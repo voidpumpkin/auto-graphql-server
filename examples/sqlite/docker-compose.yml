@@ -1,5 +1,5 @@
-# docker compose -f ./examples/sqlite/docker-compose.yml -p ags_sqlite up
-# docker compose -f ./examples/sqlite/docker-compose.yml -p ags_sqlite up down --rmi local
+# docker-compose -f ./examples/sqlite/docker-compose.yml -p ags_sqlite up
+# docker-compose -f ./examples/sqlite/docker-compose.yml -p ags_sqlite down --rmi local
 version: '3'
 services:
     server:
