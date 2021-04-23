@@ -1,9 +1,0 @@
-type Query {
-    books(author: String): [Book]
-}
-type Book {
-    author: String
-}
-type Mutation {
-    party: String
-}

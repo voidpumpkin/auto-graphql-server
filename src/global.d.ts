@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare type AnyRecord = Record<string, any>;
-
 declare type Config = {
     port?: number;
     printSql?: boolean;
@@ -13,3 +10,6 @@ declare type Config = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare type CustomResolverBuilder = (...args: any[]) => void;
 declare type CustomResolverBuilderMap = Record<string, Record<string, CustomResolverBuilder>>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare type AnyRecord = Record<string, any>;
