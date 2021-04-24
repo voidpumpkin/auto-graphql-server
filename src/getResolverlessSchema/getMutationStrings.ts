@@ -1,4 +1,5 @@
 import { isScalarType, GraphQLObjectType, isListType } from 'graphql';
+import { toSentenceCase } from './toSentenceCase';
 
 export const defaultInputArg: ArgData = {
     name: 'input',
@@ -26,10 +27,6 @@ type MutationData = {
     args: ArgData[];
     returnsList?: boolean;
 };
-
-function toSentenceCase(string: string): string {
-    return string[0].toUpperCase() + string.slice(1);
-}
 
 export function getMutationStrings(
     namedType: GraphQLObjectType,

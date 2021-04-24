@@ -14,16 +14,18 @@ export function createObjectTypeFieldResolver(
     const resultTypeFields = fieldType.getFields();
     const resultTypeName = fieldType.name;
 
-    return async (root, _, __, info) => {
+    return async (root, args, __, info) => {
         const queryType = info.schema.getQueryType();
         const modifyRootObject = createModifyRootObject(queryTypeName, queryTypeName, queryType);
         root = await modifyRootObject(info, root, knex);
 
         const selections = getSelections(info, resultTypeFields);
 
+        const queryWhere = { id: objectId ?? root[info.fieldName], ...(args?.filter || {}) };
+
         const result = await knex(resultTypeName)
             .select(...selections)
-            .where({ id: objectId ?? root[info.fieldName] });
+            .where(queryWhere);
         if (result.length > 1) {
             throw Error('More than one found');
         }

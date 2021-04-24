@@ -467,6 +467,92 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 });
             });
         });
+        Scenario('Gauti book be ryšio su Query pagal book desc ', async () => {
+            let knex: Knex;
+            let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+            let response: request.Response;
+            const query = `{ book(filter: { desc: "aaa" }){ name } }`;
+
+            before(async () => {
+                await createDBClient();
+                const creationResult = await createApp({
+                    config,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { name: String desc: String }',
+                });
+                app = creationResult.app;
+                knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given(`užklausai "${query}"`, () => {
+                query.should.exist;
+            });
+            And(`duomenų bazėje yra 4 Book, viena sujungta su Query objiektu`, async () => {
+                await knex('Book').insert({});
+                await knex('Book').insert({ name: 'bob', desc: 'aaa' });
+                await knex('Book').insert({ name: 'sam', desc: 'zzz' });
+                await knex('Query').where({ id: 1 }).update({ book: 3 });
+            });
+            When('atsakymas gražinamas', async () => {
+                response = await request(app.listen())
+                    .post(`/`)
+                    .set('Accept', 'application/json')
+                    .send({ query });
+                response.status.should.be.equal(200);
+            });
+            Then('atsakymo kūnas turėtų turėti teisingą book', async () => {
+                response.body.should.deep.equal({
+                    data: { book: null },
+                });
+            });
+        });
+        Scenario('Gauti book su ryšiu su Query pagal book id ', async () => {
+            let knex: Knex;
+            let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+            let response: request.Response;
+            const query = `{ book(filter: { desc: "aaa" }){ name } }`;
+
+            before(async () => {
+                await createDBClient();
+                const creationResult = await createApp({
+                    config,
+                    typeDefs:
+                        'schema { query: Query } type Query { book: Book } type Book { name: String desc: String }',
+                });
+                app = creationResult.app;
+                knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given(`užklausai "${query}"`, () => {
+                query.should.exist;
+            });
+            And(`duomenų bazėje yra 4 Book, viena sujungta su Query objiektu`, async () => {
+                await knex('Book').insert({});
+                await knex('Book').insert({ name: 'bob', desc: 'aaa' });
+                await knex('Book').insert({ name: 'sam', desc: 'zzz' });
+                await knex('Query').where({ id: 1 }).update({ book: 2 });
+            });
+            When('atsakymas gražinamas', async () => {
+                response = await request(app.listen())
+                    .post(`/`)
+                    .set('Accept', 'application/json')
+                    .send({ query });
+                response.status.should.be.equal(200);
+            });
+            Then('atsakymo kūnas turėtų turėti teisingą book', async () => {
+                response.body.should.deep.equal({
+                    data: { book: { name: 'bob' } },
+                });
+            });
+        });
     });
     Feature('Objiektų skaitymo operacijos kai duomenų bazėje nėra prašomų duomenų', async () => {
         Scenario('Schema turi book Book objiektą', async () => {
@@ -835,6 +921,49 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 });
             }
         );
+        Scenario('Gauti books pagal Query ryšį ir name', async () => {
+            let knex: Knex;
+            let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+            let response: request.Response;
+            const query = `{ books(filter: {name: "bob"}){ id } }`;
+
+            before(async () => {
+                await createDBClient();
+                const creationResult = await createApp({
+                    config,
+                    typeDefs:
+                        'schema { query: Query } type Query { books: [Book] } type Book { name: String }',
+                });
+                app = creationResult.app;
+                knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given(`užklausai "${query}"`, () => {
+                query.should.exist;
+            });
+            And(`duomenų bazėje yra 2 Book sujungti su Query`, async () => {
+                await knex('Book').insert({ Query_books_id: 1, name: 'ggg' });
+                await knex('Book').insert({ Query_books_id: 1, name: 'bob' });
+                await knex('Book').insert({ Query_books_id: 1, name: 'aaa' });
+                await knex('Book').insert({ name: 'bob' });
+            });
+            When('atsakymas gražinamas', async () => {
+                response = await request(app.listen())
+                    .post(`/`)
+                    .set('Accept', 'application/json')
+                    .send({ query });
+                response.status.should.be.equal(200);
+            });
+            Then('atsakymo kūnas turėtų turėti teisingą books sąrašą', async () => {
+                response.body.should.deep.equal({
+                    data: { books: [{ id: '2' }] },
+                });
+            });
+        });
     });
     Feature('Sarašų skaitymo operacijos kai duomenų bazėje nėra prašomų duomenų', async () => {
         Scenario('Schemoje query objiektas turi skaliarinį sąrašą', async () => {

@@ -5,16 +5,18 @@ import { validateQueryType } from './validateQueryType';
 import { validateObjectTypesIdFields } from './validateObjectTypesIdFields';
 import { populateSchemaMutation } from './populateSchemaMutation';
 import { populateSchemaWithIdFields } from './populateSchemaWithIdFields';
+import { populateSchemaWithFilterArgs } from './populateSchemaWithFilterArgs';
 
 export function getResolverlessSchema(typeDefs: string): GraphQLSchema {
-    const userDefinedSchema = makeExecutableSchema({ typeDefs });
+    let schema = makeExecutableSchema({ typeDefs });
 
     //Validations before auto added fields
-    validateObjectTypesIdFields(userDefinedSchema.getTypeMap());
-    validateQueryType(userDefinedSchema.getQueryType());
+    validateObjectTypesIdFields(schema.getTypeMap());
+    validateQueryType(schema.getQueryType());
 
-    const userDefinedWithAutoIdFields = populateSchemaWithIdFields(userDefinedSchema);
-    const schema = populateSchemaMutation(userDefinedWithAutoIdFields);
+    schema = populateSchemaWithIdFields(schema);
+    schema = populateSchemaWithFilterArgs(schema);
+    schema = populateSchemaMutation(schema);
 
     return schema;
 }

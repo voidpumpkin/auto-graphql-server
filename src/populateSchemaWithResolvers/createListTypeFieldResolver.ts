@@ -16,7 +16,7 @@ export function createListTypeFieldResolver(
         const resultTypeName = fieldType.ofType.name;
         const resultTypeFields = fieldType.ofType.getFields();
 
-        return async (root, _, __, info) => {
+        return async (root, args, __, info) => {
             const modifyRootObject = createModifyRootObject(
                 queryTypeName,
                 queryTypeName,
@@ -30,9 +30,13 @@ export function createListTypeFieldResolver(
             if (queryFn) {
                 result = await queryFn(resultTypeName, selections);
             } else {
+                const queryWhere = {
+                    [`${info.parentType.name}_${info.fieldName}_id`]: root.id,
+                    ...(args?.filter || {}),
+                };
                 result = await knex(resultTypeName)
                     .select(...selections)
-                    .where({ [`${info.parentType.name}_${info.fieldName}_id`]: root.id });
+                    .where(queryWhere);
             }
             return result;
         };
