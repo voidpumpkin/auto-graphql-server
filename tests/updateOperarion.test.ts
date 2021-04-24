@@ -6,7 +6,9 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import config from './testConfig.json';
+import { createDBClient } from './utils/createDBClient';
+import { removeDBClient } from './utils/removeDBClient';
+import config from './testConfig';
 
 should();
 
@@ -17,12 +19,17 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {typeCount: 3}) { typeCount } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs: 'schema { query: Query } type Query { typeCount: Int }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -50,6 +57,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {book: "1"}) { book { id } } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -59,6 +67,10 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             knex = creationResult.knex;
             await knex('Book').insert({});
         });
+        after(async () => {
+            await removeDBClient();
+        });
+
         Given(`Book su id 1 jau yra duomenų bazėje"`, async () => {
             const book = await knex('Book').where({ id: 1 }).first();
             book.should.be.ok;
@@ -88,6 +100,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {bookNames: ["bob","sam"]}) { bookNames } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs: 'schema { query: Query } type Query { bookNames: [String] }',
@@ -100,11 +113,16 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             });
             await knex('__Query_bookNames_list').insert({ Query_bookNames_id: 1, value: 'eh eh' });
         });
+        after(async () => {
+            await removeDBClient();
+        });
+
         Given(`2 Book jau yra duomenų bazėje"`, async () => {
             (await knex('__Query_bookNames_list').where({ id: 1 }).first()).should.be.ok;
             (await knex('__Query_bookNames_list').where({ id: 2 }).first()).should.be.ok;
         });
-        Given(`užklausai "${query}"`, () => {
+
+        And(`užklausai "${query}"`, () => {
             query.should.exist;
         });
         When('atsakymas gražinamas', async () => {
@@ -140,6 +158,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateQuery(input: {books: ["1","2"]}) { books { id } } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -150,6 +169,10 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             await knex('Book').insert({});
             await knex('Book').insert({});
         });
+        after(async () => {
+            await removeDBClient();
+        });
+
         Given(`2 Book jau yra duomenų bazėje"`, async () => {
             (await knex('Book').where({ id: 1 }).first()).should.be.ok;
             (await knex('Book').where({ id: 2 }).first()).should.be.ok;
@@ -179,6 +202,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateBook(input: {Query_books_id: "1"}) { id } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -188,6 +212,10 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             knex = creationResult.knex;
             await knex('Book').insert({});
         });
+        after(async () => {
+            await removeDBClient();
+        });
+
         Given(`Book su id 1 jau yra duomenų bazėje"`, async () => {
             const book = await knex('Book').where({ id: 1 }).first();
             book.should.be.ok;
@@ -218,6 +246,7 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
         const query = `mutation { updateBook(filter: {identification: "6"}, input: {Query_books_id: "1"}) { id } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -227,6 +256,10 @@ Feature('🆕Duomenų atnaujinimo operacijos', async () => {
             knex = creationResult.knex;
             await knex('Book').insert({ identification: 6 });
         });
+        after(async () => {
+            await removeDBClient();
+        });
+
         Given(`Book su id 1 jau yra duomenų bazėje"`, async () => {
             const book = await knex('Book').where({ id: 1, identification: 6 }).first();
             book.should.be.ok;

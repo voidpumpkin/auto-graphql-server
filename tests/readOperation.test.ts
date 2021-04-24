@@ -6,7 +6,9 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import config from './testConfig.json';
+import { createDBClient } from './utils/createDBClient';
+import { removeDBClient } from './utils/removeDBClient';
+import config from './testConfig';
 
 should();
 
@@ -17,11 +19,16 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ id }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { identification: ID }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -48,6 +55,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ executionCount }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { executionCount: Int }',
@@ -55,6 +63,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 app = creationResult.app;
                 knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ executionCount: 1 });
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -81,6 +93,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ executionCount }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { executionCount: Float }',
@@ -88,6 +101,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 app = creationResult.app;
                 knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ executionCount: 1.2 });
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -114,6 +131,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ name }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { name: String }',
@@ -121,6 +139,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 app = creationResult.app;
                 knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ name: 'bob' });
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -147,6 +169,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ isTrue }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { isTrue: Boolean }',
@@ -154,6 +177,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 app = creationResult.app;
                 knex = creationResult.knex;
                 await knex('Query').where({ id: 1 }).update({ isTrue: true });
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -179,11 +206,16 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ bob }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { bob: ID }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -209,11 +241,16 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ executionCount }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { executionCount: Int }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -239,11 +276,16 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ executionCount }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { executionCount: Float }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -269,11 +311,16 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ name }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { name: String }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -299,11 +346,16 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ isTrue }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { isTrue: Boolean }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -331,6 +383,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ book{ id } }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -338,6 +391,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -368,6 +425,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ book{ title{ short } } }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -375,6 +433,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -413,12 +475,17 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ book{ id } }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query { book: Book } type Book { identification: ID }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -446,6 +513,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ book{ title{ short } } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
@@ -453,6 +521,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     });
                     app = creationResult.app;
                     knex = creationResult.knex;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -486,6 +558,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ book{ title{ short } } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
@@ -493,6 +566,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     });
                     app = creationResult.app;
                     knex = creationResult.knex;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -524,12 +601,17 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ ids }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { ids: [ID] }',
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -559,6 +641,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ books{ id } }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -566,6 +649,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -597,6 +684,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ books{ author{ name } } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
@@ -604,6 +692,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     });
                     app = creationResult.app;
                     knex = creationResult.knex;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -645,6 +737,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ books{ authors{ name } } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
@@ -652,6 +745,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     });
                     app = creationResult.app;
                     knex = creationResult.knex;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -695,6 +792,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ book{ authors{ name } } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
@@ -702,6 +800,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     });
                     app = creationResult.app;
                     knex = creationResult.knex;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -741,11 +843,16 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
             const query = `{ ids }`;
 
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { ids: [ID] }',
                 });
                 app = creationResult.app;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -773,6 +880,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ books{ bob } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
@@ -780,6 +888,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     });
                     app = creationResult.app;
                     knex = creationResult.knex;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -811,12 +923,17 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ books{ bob } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
                             'schema { query: Query } type Query { books: [Book] } type Book { bob: ID }',
                     });
                     app = creationResult.app;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {
@@ -845,6 +962,7 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 const query = `{ books{ authors{ name } } }`;
 
                 before(async () => {
+                    await createDBClient();
                     const creationResult = await createApp({
                         config,
                         typeDefs:
@@ -852,6 +970,10 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                     });
                     app = creationResult.app;
                     knex = creationResult.knex;
+                });
+
+                after(async () => {
+                    await removeDBClient();
                 });
 
                 Given(`užklausai "${query}"`, () => {

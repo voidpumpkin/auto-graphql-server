@@ -6,7 +6,9 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import config from './testConfig.json';
+import { createDBClient } from './utils/createDBClient';
+import { removeDBClient } from './utils/removeDBClient';
+import config from './testConfig';
 
 should();
 
@@ -16,11 +18,16 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeQuery() { id } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs: 'schema { query: Query } type Query { identification: ID }',
             });
             app = creationResult.app;
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -46,6 +53,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {id: "1"}) { id } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -54,6 +62,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             app = creationResult.app;
             knex = creationResult.knex;
             await knex('Book').insert({});
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -84,6 +96,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -92,6 +105,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             app = creationResult.app;
             knex = creationResult.knex;
             await knex('Book').insert({ name: '1' });
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -122,6 +139,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {readable: true}) { readable } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -130,6 +148,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             app = creationResult.app;
             knex = creationResult.knex;
             await knex('Book').insert({ readable: true });
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -160,6 +182,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {pages: 5}) { pages } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -168,6 +191,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             app = creationResult.app;
             knex = creationResult.knex;
             await knex('Book').insert({ pages: 5 });
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -198,6 +225,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {probability: 0.3}) { probability } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -206,6 +234,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             app = creationResult.app;
             knex = creationResult.knex;
             await knex('Book').insert({ probability: 0.3 });
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -236,6 +268,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -245,6 +278,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             knex = creationResult.knex;
             await knex('Book').insert({ name: '1' });
             await knex('Book').insert({ name: '1' });
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -275,6 +312,7 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {author: "1"}) { author { name } } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
@@ -284,6 +322,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             knex = creationResult.knex;
             await knex('Author').insert({ name: 'bob' });
             await knex('Book').insert({ author: '1' });
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -316,12 +358,17 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         const query = `mutation { removeBook(filter: {authors: ["1"]}) { authors { name } } }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
                     'schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }',
             });
             app = creationResult.app;
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {

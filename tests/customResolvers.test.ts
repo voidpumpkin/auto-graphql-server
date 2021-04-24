@@ -6,7 +6,9 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import config from './testConfig.json';
+import { createDBClient } from './utils/createDBClient';
+import { removeDBClient } from './utils/removeDBClient';
+import config from './testConfig';
 
 should();
 
@@ -17,6 +19,7 @@ Feature('💼Klieto duoti išsprendėjai', async () => {
         const query = `query { typeCount }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs: 'schema { query: Query } type Query { typeCount: Int }',
@@ -31,6 +34,10 @@ Feature('💼Klieto duoti išsprendėjai', async () => {
             app = creationResult.app;
             knex = creationResult.knex;
             await knex('Query').where({ id: 1 }).update({ typeCount: 3 });
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {
@@ -57,6 +64,7 @@ Feature('💼Klieto duoti išsprendėjai', async () => {
         const query = `mutation { party }`;
         let response: request.Response;
         before(async () => {
+            await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs: 'type Query { typeCount: Int } type Mutation { party: String }',
@@ -67,6 +75,10 @@ Feature('💼Klieto duoti išsprendėjai', async () => {
                 },
             });
             app = creationResult.app;
+        });
+
+        after(async () => {
+            await removeDBClient();
         });
 
         Given(`užklausai "${query}"`, () => {

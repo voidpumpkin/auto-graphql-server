@@ -120,30 +120,40 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                 }
 
                 await Promise.all(
-                    Object.entries(listInputs).map(async ([inputName, valueList]) =>
-                        Promise.all(
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            valueList.map(async (value: any) => {
-                                if (isScalarType(listFields[inputName].type.ofType)) {
-                                    const tableName = `__${returnTypeName}_${inputName}_list`;
-                                    const relationshipName = `${returnTypeName}_${inputName}_id`;
-                                    await knex(tableName)
-                                        .where({ [relationshipName]: root.id })
-                                        .delete();
+                    Object.entries(listInputs).map(async ([inputName, valueList]) => {
+                        const tableName = `__${returnTypeName}_${inputName}_list`;
+                        const relationshipName = `${returnTypeName}_${inputName}_id`;
+                        if (isScalarType(listFields[inputName].type.ofType)) {
+                            await knex(tableName)
+                                .where({ [relationshipName]: root.id })
+                                .delete();
+                            await valueList.reduce(
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                async (prevPromise: Promise<void>, value: any) => {
+                                    await prevPromise;
+
                                     await knex(tableName).insert({
                                         value,
                                         [relationshipName]: root.id,
                                     });
-                                } else {
+                                },
+                                Promise.resolve(undefined)
+                            );
+                        } else {
+                            await valueList.reduce(
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                async (prevPromise: Promise<void>, value: any) => {
+                                    await prevPromise;
                                     await knex(listFields[inputName].type.ofType.name)
                                         .where({ id: value })
                                         .update({
                                             [`${returnTypeName}_${inputName}_id`]: root.id,
                                         });
-                                }
-                            })
-                        )
-                    )
+                                },
+                                Promise.resolve(undefined)
+                            );
+                        }
+                    })
                 );
 
                 const returnResolver = createListTypeFieldResolver(

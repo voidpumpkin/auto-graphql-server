@@ -4,19 +4,25 @@ import 'mocha-cakes-2';
 import Knex from 'knex';
 
 import { createApp } from '../src/createApp';
-
-import config from './testConfig.json';
+import { createDBClient } from './utils/createDBClient';
+import { removeDBClient } from './utils/removeDBClient';
+import config from './testConfig';
 
 Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature('Query lentelės generavimas su skaliariniais tipais', async () => {
         Scenario('Schemos query turi String skaliarinį tipą', async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { name: String }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurta Query lentelė', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -33,12 +39,17 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario('Schemos query turi 2 skaliarinius tipus', async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { name: String iteration: Int }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurta Query lentelė', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -52,20 +63,28 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
                 expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
-                expect((await knex('Query').columnInfo('iteration')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('iteration')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
             });
         });
     });
     Feature('Objiektų tipo esybių lentelių generavimas', async () => {
         Scenario('Schemos query turi 1 objiekto tipą', async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query { book: Book } type Book { name: String iteration: Int }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -76,8 +95,8 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Book', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
-                expect((await knex('Book').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
+                expect((await knex('Book').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Book', 'name')).to.be.true;
@@ -85,26 +104,37 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
                 expect((await knex('Book').columnInfo('name')).type).to.be.string('varchar');
-                expect((await knex('Book').columnInfo('iteration')).type).to.be.string('integer');
+                expect((await knex('Book').columnInfo('iteration')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
             });
             And('tipų su objiektais lentelės turi turėti svetimus raktų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Query', 'book')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('book')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('book')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
             });
         });
         Scenario(
             'Schemos query turi objiekto tipą kuris turi kitą objiekto tipą ir tipą kuris turi dar savo objiekto tipą',
             async () => {
                 let knex: Knex;
-                When('kuriamas serveris', async () => {
-                    const { knex: _knex } = await createApp({
+                after(async () => {
+                    await removeDBClient();
+                });
+
+                Given('kuriamas serveris', async () => {
+                    await createDBClient();
+                    const creationResult = await createApp({
                         config,
                         typeDefs:
                             'schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }',
                     });
-                    knex = _knex;
+                    knex = creationResult.knex;
                 });
                 Then('turi būti sukurtos objiektų lentelės', async () => {
                     expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -117,9 +147,18 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     expect(await knex.schema.hasColumn('Author', 'id')).to.be.true;
                 });
                 And('jų tipai turi būti teisingi', async () => {
-                    expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
-                    expect((await knex('Book').columnInfo('id')).type).to.be.string('integer');
-                    expect((await knex('Author').columnInfo('id')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
+                    expect((await knex('Book').columnInfo('id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
+                    expect((await knex('Author').columnInfo('id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
                 });
                 And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                     expect(await knex.schema.hasColumn('Author', 'name')).to.be.true;
@@ -135,8 +174,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     }
                 );
                 And('jų tipai turi būti teisingi', async () => {
-                    expect((await knex('Query').columnInfo('book')).type).to.be.string('integer');
-                    expect((await knex('Book').columnInfo('author')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('book')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
+                    expect((await knex('Book').columnInfo('author')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
                 });
             }
         );
@@ -144,12 +189,17 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature('Skaliarinių sarašų tipo esybių lentelių generavimas', async () => {
         Scenario('Schemos query turi skaliarinį sąrašą', async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { probabilities: [Float] }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -158,7 +208,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('turi būti sukurtos skaliarinių sarašų lentelės', async () => {
                 expect(await knex.schema.hasTable('__Query_probabilities_list')).to.be.true;
@@ -179,27 +229,32 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 }
             );
             And('jų tipai turi būti teisingi', async () => {
-                expect(
-                    (await knex('__Query_probabilities_list').columnInfo('id')).type
-                ).to.be.string('integer');
+                expect((await knex('__Query_probabilities_list').columnInfo('id')).type).to.include(
+                    'int'
+                );
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('value')).type
                 ).to.be.string('float');
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('Query_probabilities_id'))
                         .type
-                ).to.be.string('integer');
+                ).to.be.oneOf(['integer', 'int']);
             });
         });
         Scenario('Schemos query turi 2 skaliarinius sąrašus', async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query { probabilities: [Float] executionResults: [Boolean] }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -208,7 +263,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('turi būti sukurtos skaliarinių sarašų lentelės', async () => {
                 expect(await knex.schema.hasTable('__Query_probabilities_list')).to.be.true;
@@ -240,42 +295,47 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 }
             );
             And('jų tipai turi būti teisingi', async () => {
-                expect(
-                    (await knex('__Query_probabilities_list').columnInfo('id')).type
-                ).to.be.string('integer');
+                expect((await knex('__Query_probabilities_list').columnInfo('id')).type).to.include(
+                    'int'
+                );
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('value')).type
                 ).to.be.string('float');
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('Query_probabilities_id'))
                         .type
-                ).to.be.string('integer');
+                ).to.be.oneOf(['integer', 'int']);
                 expect(
                     (await knex('__Query_executionResults_list').columnInfo('id')).type
-                ).to.be.string('integer');
+                ).to.be.oneOf(['integer', 'int']);
                 expect(
                     (await knex('__Query_executionResults_list').columnInfo('value')).type
-                ).to.be.string('boolean');
+                ).to.be.oneOf(['boolean', 'tinyint']);
                 expect(
                     (
                         await knex('__Query_executionResults_list').columnInfo(
                             'Query_executionResults_id'
                         )
                     ).type
-                ).to.be.string('integer');
+                ).to.be.oneOf(['integer', 'int']);
             });
         });
     });
     Feature('Objiektų sarašų tipo esybių lentelių generavimas', async () => {
         Scenario('Schemos query turi objiekto tipo sąrašą', async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query { books: [Book] } type Book { name: String }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -286,8 +346,8 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Book', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
-                expect((await knex('Book').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
+                expect((await knex('Book').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Book', 'name')).to.be.true;
@@ -302,22 +362,28 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 }
             );
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Book').columnInfo('Query_books_id')).type).to.be.string(
-                    'integer'
-                );
+                expect((await knex('Book').columnInfo('Query_books_id')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
             });
         });
         Scenario(
             'Schemos query turi objiekto tipo sąrašą kuris turi objiekto tipo sąrašą',
             async () => {
                 let knex: Knex;
-                When('kuriamas serveris', async () => {
-                    const { knex: _knex } = await createApp({
+                after(async () => {
+                    await removeDBClient();
+                });
+
+                Given('kuriamas serveris', async () => {
+                    await createDBClient();
+                    const creationResult = await createApp({
                         config,
                         typeDefs:
                             'schema { query: Query } type Query { books: [Book] } type Book { author: [Author] } type Author { name: String }',
                     });
-                    knex = _knex;
+                    knex = creationResult.knex;
                 });
                 Then('turi būti sukurtos objiektų lentelės', async () => {
                     expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -330,9 +396,18 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     expect(await knex.schema.hasColumn('Author', 'id')).to.be.true;
                 });
                 And('jų tipai turi būti teisingi', async () => {
-                    expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
-                    expect((await knex('Book').columnInfo('id')).type).to.be.string('integer');
-                    expect((await knex('Author').columnInfo('id')).type).to.be.string('integer');
+                    expect((await knex('Query').columnInfo('id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
+                    expect((await knex('Book').columnInfo('id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
+                    expect((await knex('Author').columnInfo('id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
                 });
                 And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                     expect(await knex.schema.hasColumn('Author', 'name')).to.be.true;
@@ -348,12 +423,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     }
                 );
                 And('jų tipai turi būti teisingi', async () => {
-                    expect((await knex('Book').columnInfo('Query_books_id')).type).to.be.string(
-                        'integer'
-                    );
-                    expect((await knex('Author').columnInfo('Book_author_id')).type).to.be.string(
-                        'integer'
-                    );
+                    expect((await knex('Book').columnInfo('Query_books_id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
+                    expect((await knex('Author').columnInfo('Book_author_id')).type).to.be.oneOf([
+                        'integer',
+                        'int',
+                    ]);
                 });
             }
         );
@@ -362,13 +439,18 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
     Feature.skip("Lentelių generavimas su interface'ais", async () => {
         Scenario("Interface'sas turi 1 skaliarinio tipo esybę", async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query implements Face { name: String } interface Face { score: Int }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -377,7 +459,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
@@ -392,18 +474,26 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 }
             );
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('score')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
             });
         });
         Scenario("Interface'sas turi skaliarinio tipo sąrašą", async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query implements Face { name: String } interface Face { scores: [Int] }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -412,7 +502,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
@@ -441,12 +531,16 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 );
                 expect(
                     (await knex('__Query_scores_list').columnInfo('Query_scores_id')).type
-                ).to.be.string('integer');
+                ).to.be.oneOf(['integer', 'int']);
             });
         });
         Scenario("Interface'sas turi objiekto tipo sąrašą", async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -463,8 +557,8 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Book', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
-                expect((await knex('Book').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
+                expect((await knex('Book').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
@@ -488,13 +582,18 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
         });
         Scenario("Objiektas paveldi 2 Interface'sus", async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query implements Face & Body { name: String } interface Face { score: Int } interface Body { hasLimbs: Boolean }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -503,7 +602,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
@@ -512,19 +611,30 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
                 expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
-                expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
-                expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.string('boolean');
+                expect((await knex('Query').columnInfo('score')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
+                expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.oneOf([
+                    'boolean',
+                    'tinyint',
+                ]);
             });
         });
         Scenario("Objiektas paveldi Interface'a kuris paveldi kitą Interface'a", async () => {
             let knex: Knex;
-            When('kuriamas serveris', async () => {
-                const { knex: _knex } = await createApp({
+            after(async () => {
+                await removeDBClient();
+            });
+
+            Given('kuriamas serveris', async () => {
+                await createDBClient();
+                const creationResult = await createApp({
                     config,
                     typeDefs:
                         'schema { query: Query } type Query implements Face { name: String } interface Face implements Circle { score: Int } interface Circle { hasLimbs: Boolean }',
                 });
-                knex = _knex;
+                knex = creationResult.knex;
             });
             Then('turi būti sukurtos objiektų lentelės', async () => {
                 expect(await knex.schema.hasTable('Query')).to.be.true;
@@ -533,7 +643,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'id')).to.be.true;
             });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Query').columnInfo('id')).type).to.be.string('integer');
+                expect((await knex('Query').columnInfo('id')).type).to.be.oneOf(['integer', 'int']);
             });
             And('tipų su skaliarais lentelės turi turėti skaliarų stulpelius', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
@@ -542,8 +652,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
                 expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
-                expect((await knex('Query').columnInfo('score')).type).to.be.string('integer');
-                expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.string('boolean');
+                expect((await knex('Query').columnInfo('score')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
+                expect((await knex('Query').columnInfo('hasLimbs')).type).to.be.oneOf([
+                    'boolean',
+                    'tinyint',
+                ]);
             });
         });
     });

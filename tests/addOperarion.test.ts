@@ -6,7 +6,9 @@ import Knex from 'knex';
 import Koa from 'koa';
 
 import { createApp } from '../src/createApp';
-import config from './testConfig.json';
+import { createDBClient } from './utils/createDBClient';
+import { removeDBClient } from './utils/removeDBClient';
+import config from './testConfig';
 
 should();
 
@@ -17,11 +19,19 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addQuery(input: {id: "2"}) { id } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs: 'schema { query: Query } type Query { identification: ID }',
                 });
                 app = creationResult.app;
+            });
+            after(async () => {
+                await removeDBClient();
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -47,6 +57,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {id: "1"}) { id } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -54,6 +65,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -81,6 +96,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {name: "Game of thrones"}) { name } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -88,6 +104,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -115,6 +135,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {named: true }) { named } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -122,6 +143,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -149,6 +174,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2}) { probability } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -156,6 +182,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -183,6 +213,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2.2}) { probability } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -190,6 +221,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -219,6 +254,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {probability: 2.2, Query_books_id: "1"}) { probability } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -226,6 +262,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -257,6 +297,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {authors: ["1"]}) { authors { name } } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -265,6 +306,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 app = creationResult.app;
                 knex = creationResult.knex;
                 await knex('Author').insert({ name: 'Bob' });
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`autorius su id 1 jau yra duomenų bazėje"`, async () => {
@@ -297,6 +342,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {authors: ["Bob"]}) { authors } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -304,6 +350,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
                 app = creationResult.app;
                 knex = creationResult.knex;
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`užklausai "${query}"`, () => {
@@ -335,6 +385,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             const query = `mutation { addBook(input: {author: "1"}) { author { name } } }`;
             let response: request.Response;
             before(async () => {
+                await createDBClient();
                 const creationResult = await createApp({
                     config,
                     typeDefs:
@@ -343,6 +394,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 app = creationResult.app;
                 knex = creationResult.knex;
                 await knex('Author').insert({ name: 'Bob' });
+            });
+
+            after(async () => {
+                await removeDBClient();
             });
 
             Given(`autorius su id 1 jau yra duomenų bazėje"`, async () => {
