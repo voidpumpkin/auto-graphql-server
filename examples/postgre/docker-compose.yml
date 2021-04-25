@@ -1,0 +1,31 @@
+version: '3'
+services:
+    server:
+        build: ../..
+        depends_on:
+            - database
+        ports:
+            - '3001:3001'
+        volumes:
+            - data:/app/data
+        deploy:
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 5
+                window: 60s
+        container_name: ags_postgre_server
+    database:
+        image: 'postgres'
+        environment:
+            POSTGRES_USER: agsuser
+            POSTGRES_PASSWORD: agspassword
+            POSTGRES_DB: agsdb
+        ports:
+            - '5432:5432'
+        volumes:
+            - db:/var/lib/postgresql/data
+        container_name: ags_postgre_database
+volumes:
+    data:
+    db:

@@ -34,7 +34,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
             });
             And('jo tipas turi atitkti schemoje nurodytą tipą', async () => {
-                expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Query').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
             });
         });
         Scenario('Schemos query turi 2 skaliarinius tipus', async () => {
@@ -62,7 +65,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'iteration')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Query').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
                 expect((await knex('Query').columnInfo('iteration')).type).to.be.oneOf([
                     'integer',
                     'int',
@@ -103,7 +109,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Book', 'iteration')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Book').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Book').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
                 expect((await knex('Book').columnInfo('iteration')).type).to.be.oneOf([
                     'integer',
                     'int',
@@ -164,7 +173,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     expect(await knex.schema.hasColumn('Author', 'name')).to.be.true;
                 });
                 And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                    expect((await knex('Author').columnInfo('name')).type).to.be.string('varchar');
+                    expect((await knex('Author').columnInfo('name')).type).to.be.oneOf([
+                        'varchar',
+                        'character varying',
+                    ]);
                 });
                 And(
                     'tipų su objiektais lentelės turi turėti svetimus raktų stulpelius',
@@ -234,7 +246,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 );
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('value')).type
-                ).to.be.string('float');
+                ).to.be.oneOf(['float', 'real']);
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('Query_probabilities_id'))
                         .type
@@ -300,7 +312,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 );
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('value')).type
-                ).to.be.string('float');
+                ).to.be.oneOf(['float', 'real']);
                 expect(
                     (await knex('__Query_probabilities_list').columnInfo('Query_probabilities_id'))
                         .type
@@ -353,7 +365,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Book', 'name')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Book').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Book').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
             });
             And(
                 'tipų kurie yra tevų objiekte kaip sąrašas lentelės turi turėti svetimus tėvų raktų stulpelius',
@@ -413,7 +428,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     expect(await knex.schema.hasColumn('Author', 'name')).to.be.true;
                 });
                 And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                    expect((await knex('Author').columnInfo('name')).type).to.be.string('varchar');
+                    expect((await knex('Author').columnInfo('name')).type).to.be.oneOf([
+                        'varchar',
+                        'character varying',
+                    ]);
                 });
                 And(
                     'tipų kurie yra tevų objiekte kaip sąrašas lentelės turi turėti svetimus tėvų raktų stulpelius',
@@ -465,7 +483,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Query').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
             });
             And(
                 'paveldėjusių tipų lentelės turi turėti paveldėtus skaliarinius stulpelius',
@@ -508,7 +529,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'name')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Query').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
             });
             And('turi būti sukurtos paveldėtų skaliarinių sarašų lentelės', async () => {
                 expect(await knex.schema.hasTable('__Query_scores_list')).to.be.true;
@@ -565,8 +589,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Book', 'name')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
-                expect((await knex('Book').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Query').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
+                expect((await knex('Book').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
             });
             And(
                 'tipų kurie yra tevų objiekte kaip sąrašas lentelės turi turėti svetimus tėvų raktų stulpelius',
@@ -610,7 +640,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'hasLimbs')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Query').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
                 expect((await knex('Query').columnInfo('score')).type).to.be.oneOf([
                     'integer',
                     'int',
@@ -651,7 +684,10 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                 expect(await knex.schema.hasColumn('Query', 'hasLimbs')).to.be.true;
             });
             And('jų tipai turi atitkti schemoje nurodytus tipus', async () => {
-                expect((await knex('Query').columnInfo('name')).type).to.be.string('varchar');
+                expect((await knex('Query').columnInfo('name')).type).to.be.oneOf([
+                    'varchar',
+                    'character varying',
+                ]);
                 expect((await knex('Query').columnInfo('score')).type).to.be.oneOf([
                     'integer',
                     'int',

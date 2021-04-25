@@ -19,6 +19,16 @@ const mysqlDBConfig = {
     },
 };
 
+const pgDBConfig = {
+    client: 'pg',
+    connection: {
+        host: 'localhost',
+        user: 'testuser',
+        password: 'testpassword',
+        database: 'testdb',
+    },
+};
+
 export default {
     graphqlHTTP: {
         graphiql: false,

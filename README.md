@@ -5,7 +5,7 @@ auto-graphql-server is a 🐋docker image that automaticly generates a backend f
 If you ever are too lazy to implement a simple CRUD backend, go ahead and use this!
 
 -   Only requires a **graphql.schema** and a **config.json** to function
--   Supports **Sqlite** and **MySQL**
+-   Supports **Sqlite**, **MySQL** and **PostgreDB**
 -   Contains many [examples](./examples/) to learn from!
 
 ## 🏃‍♀️ Running this image
@@ -37,7 +37,7 @@ type Config = {
 -   `deleteDbCreationIfExists` sqlite only, will delete
 -   `graphqlHTTP` field takes any []() options but most of the time you just want GraphiQL interface with: `{ "graphiql": true }`
 -   `database` field is a [Knex.js](https://knexjs.org/#Installation-client) configuration
-    -   Supported db clients - **sqlite** and **mysql2**
+    -   Supported db clients - **sqlite**, **mysql2** and **pg**
 
 ## 🎨 Custom resolvers
 

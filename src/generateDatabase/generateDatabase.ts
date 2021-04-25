@@ -17,7 +17,17 @@ export async function generateDatabase({
         throw Error('config database field is incorrect or missing');
     }
 
-    let knex = Knex(config.database);
+    let knex = Knex({
+        ...config.database,
+        log: {
+            warn(message) {
+                if (!message.includes('.returning() is not supported')) {
+                    console.log(message);
+                }
+            },
+            ...(config.database?.log || {}),
+        },
+    });
 
     if (config.printSql) {
         knex.on('query', function (queryData) {

@@ -54,7 +54,9 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
                     nonListFields
                 );
 
-                const insertResultIds = await knex(info.returnType.name).insert(nonListInputs);
+                const insertResultIds = await knex(info.returnType.name)
+                    .returning('id')
+                    .insert(nonListInputs);
 
                 await Promise.all(
                     Object.entries(listInputs).map(async ([inputName, valueList]) =>
