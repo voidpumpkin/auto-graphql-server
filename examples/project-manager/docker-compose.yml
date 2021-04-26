@@ -1,0 +1,53 @@
+version: '3'
+services:
+    server:
+        build: ../..
+        depends_on:
+            - database
+        volumes:
+            - type: bind
+              source: ./data
+              target: /app/data
+        deploy:
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 5
+                window: 60s
+        container_name: ags_pm_server
+    database:
+        image: 'postgres'
+        environment:
+            POSTGRES_USER: agsuser
+            POSTGRES_PASSWORD: agspassword
+            POSTGRES_DB: agsdb
+        volumes:
+            - db:/var/lib/postgresql/data
+        ports:
+            - '5432:5432'
+        container_name: ags_pm_database
+    app:
+        build: ./frontend
+        container_name: ags_pm_app
+        volumes:
+            - public:/app/public
+    caddy:
+        image: caddy
+        depends_on:
+            - app
+        volumes:
+            - public:/srv
+            - caddyc:/data
+            - caddyd:/config
+            - type: bind
+              source: ./caddy/Caddyfile
+              target: /etc/caddy/Caddyfile
+        ports:
+            - 80:80
+            - 443:443
+        container_name: ags_pm_caddy
+volumes:
+    db:
+    public:
+    caddyc:
+    caddyd:

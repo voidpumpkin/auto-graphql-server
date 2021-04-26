@@ -23,9 +23,9 @@ auto-graphql-server requires **graphql.schema** and **config.json** files to fun
 ```ts
 type Config = {
     port?: number;
-    printSql?: boolean;
-    skipDbCreationIfExists?: boolean;
-    deleteDbCreationIfExists?: boolean;
+    printSql?: boolean; //default false
+    skipDbCreationIfExists?: boolean; //default true
+    deleteDbCreationIfExists?: boolean; //default false
     graphqlHTTP?: Omit<graphqlHTTP.Options, 'schema'>;
     database?: Knex.Config;
 };
@@ -35,7 +35,7 @@ type Config = {
 -   `printSql` whether or not print all Knex generated SQL commands
 -   `skipDbCreationIfExists` whether or not skip table generations for db if they already exist
 -   `deleteDbCreationIfExists` sqlite only, will delete
--   `graphqlHTTP` field takes any []() options but most of the time you just want GraphiQL interface with: `{ "graphiql": true }`
+-   `graphqlHTTP` field takes any [koa-graphql options](https://www.npmjs.com/package/koa-graphql#options) options but most of the time you just want GraphiQL interface with: `{ "graphiql": true }`
 -   `database` field is a [Knex.js](https://knexjs.org/#Installation-client) configuration
     -   Supported db clients - **sqlite**, **mysql2** and **pg**
 

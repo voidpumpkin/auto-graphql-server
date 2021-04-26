@@ -3,6 +3,13 @@
 mochawesome-report/
 data/
 
+#project manager example
+/examples/project-manager/frontend/node_modules/
+/examples/project-manager/frontend/public/build/
+
+.DS_Store
+
+
 # Logs
 logs
 *.log

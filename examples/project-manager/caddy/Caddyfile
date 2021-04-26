@@ -1,0 +1,15 @@
+
+(serve) {
+    root * {arg.0}
+    encode zstd gzip
+    file_server
+}
+
+localhost {
+    @graphql {
+        path /graphql/*
+        path /graphql
+    }
+    reverse_proxy @graphql server:3001
+    import serve /srv
+}

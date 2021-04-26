@@ -49,7 +49,7 @@ export async function createApp({
 
     const app = new Koa();
 
-    app.use(mount('/', graphqlHTTP({ schema, ...config.graphqlHTTP })));
+    app.use(mount(graphqlHTTP({ schema, ...config.graphqlHTTP })));
 
     return { app, knex };
 }
