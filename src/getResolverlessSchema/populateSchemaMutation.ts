@@ -1,10 +1,11 @@
 import { GraphQLSchema, isEqualType, isObjectType, GraphQLObjectType } from 'graphql';
 import { getMutationStrings, defaultInputArg } from './getMutationStrings';
 import { mergeSchemas } from '@graphql-tools/merge';
+import { NO_TABLE } from '../directives';
 
 export function populateSchemaMutation(schema: GraphQLSchema): GraphQLSchema {
     const schemaTypeMap = schema.getTypeMap();
-    let mutationTypeDefs = 'schema { mutation: Mutation } ';
+    let mutationTypeDefs = `schema { mutation: Mutation } `;
     let mutationFields = '';
 
     const namedTypes = Object.entries(schemaTypeMap)
@@ -31,7 +32,7 @@ export function populateSchemaMutation(schema: GraphQLSchema): GraphQLSchema {
     if (!mutationFields) {
         return schema;
     }
-    mutationTypeDefs += `type Mutation { ${mutationFields}} `;
+    mutationTypeDefs += `type Mutation @${NO_TABLE} { ${mutationFields}} `;
 
     return mergeSchemas({
         schemas: [schema],

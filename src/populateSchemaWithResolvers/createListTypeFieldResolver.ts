@@ -3,6 +3,7 @@ import Knex from 'knex';
 import { createModifyRootObject } from './createModifyRootObject';
 import { IFieldResolver } from 'graphql-tools';
 import { getSelections } from './getSelections';
+import { recursivelyGetAllFields } from '../generateDatabase/recursivelyGetAllFields';
 
 export function createListTypeFieldResolver(
     knex: Knex,
@@ -14,7 +15,9 @@ export function createListTypeFieldResolver(
 ): IFieldResolver<any, any, any> {
     if (isObjectType(fieldType.ofType)) {
         const resultTypeName = fieldType.ofType.name;
-        const resultTypeFields = fieldType.ofType.getFields();
+        const resultTypeFieldsMap = recursivelyGetAllFields({
+            type: fieldType.ofType,
+        }).reduce((acc, field) => ({ ...acc, [field.name]: field }), {});
 
         return async (root, args, __, info) => {
             const modifyRootObject = createModifyRootObject(
@@ -24,21 +27,42 @@ export function createListTypeFieldResolver(
             );
             root = await modifyRootObject(info, root, knex);
 
-            const selections = getSelections(info, resultTypeFields);
-
             let result;
             if (queryFn) {
+                const selections = getSelections(info, resultTypeFieldsMap);
                 result = await queryFn(resultTypeName, selections);
             } else {
-                const queryWhere = {
-                    [`${info.parentType.name}_${info.fieldName}_id`]: root.id,
-                    ...(args?.filter || {}),
-                };
-                result = await knex(resultTypeName)
-                    .select(...selections)
-                    .where(queryWhere);
+                const filters = Object.entries(args?.filter || {}).reduce(
+                    (acc, [key, val]) => ({ ...acc, [`${resultTypeName}.${key}`]: val }),
+                    {}
+                );
+
+                if (root?.parentIdsFieldName === info.fieldName) {
+                    const queryWhere = {
+                        id: root[`${resultTypeName}_id`],
+                        ...filters,
+                    };
+                    result = await knex(resultTypeName).select().where(queryWhere);
+                } else {
+                    const listTableName = `__${info.parentType.name}_${info.fieldName}_list`;
+                    const queryWhere = {
+                        [`${listTableName}.${info.parentType.name}_id`]: root.id,
+                        ...filters,
+                    };
+                    result = await knex(listTableName)
+                        .select()
+                        .innerJoin(
+                            resultTypeName,
+                            `${resultTypeName}.id`,
+                            `${listTableName}.${info.parentType.name}_${info.fieldName}_${resultTypeName}_id`
+                        )
+                        .where(queryWhere);
+                }
             }
-            return result;
+            return result.map((r) => ({
+                ...r,
+                parentIdsFieldName: `${info.parentType.name}_${info.fieldName}_${info.parentType.name}_list`,
+            }));
         };
     } else if (isScalarType(fieldType.ofType)) {
         return async (root, _, __, info) => {

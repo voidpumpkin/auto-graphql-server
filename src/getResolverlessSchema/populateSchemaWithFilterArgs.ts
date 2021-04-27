@@ -33,10 +33,7 @@ export function populateSchemaWithFilterArgs(schema: GraphQLSchema): GraphQLSche
                     fieldTypeName = `[${field.type.ofType.name}]`;
                     const fieldTypeOfTypeFields = Object.values(
                         field.type.ofType.getFields()
-                    ).filter(
-                        (fieldTypeOfTypeField) =>
-                            fieldTypeOfTypeField.name !== `${type.name}_${field.name}_id`
-                    );
+                    ).filter((fieldTypeOfTypeField) => !isListType(fieldTypeOfTypeField.type));
                     fieldTypeFieldsString = getObjectTypeInputFields(fieldTypeOfTypeFields);
                 }
             }

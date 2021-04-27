@@ -370,17 +370,27 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     'character varying',
                 ]);
             });
-            And(
-                'tipų kurie yra tevų objiekte kaip sąrašas lentelės turi turėti svetimus tėvų raktų stulpelius',
-                async () => {
-                    expect(await knex.schema.hasColumn('Book', 'Query_books_id')).to.be.true;
-                }
-            );
+            And('objiektų sąrašo tipo esybės turi tureti savo lenteles', async () => {
+                expect(await knex.schema.hasTable('__Query_books_list')).to.be.true;
+            });
+            And('jie turi turėti tesingus stulpelius', async () => {
+                expect(await knex.schema.hasColumn('__Query_books_list', 'id')).to.be.true;
+                expect(await knex.schema.hasColumn('__Query_books_list', 'Query_id')).to.be.true;
+                expect(await knex.schema.hasColumn('__Query_books_list', 'Query_books_Book_id')).to
+                    .be.true;
+            });
             And('jų tipai turi būti teisingi', async () => {
-                expect((await knex('Book').columnInfo('Query_books_id')).type).to.be.oneOf([
+                expect((await knex('__Query_books_list').columnInfo('id')).type).to.be.oneOf([
                     'integer',
                     'int',
                 ]);
+                expect((await knex('__Query_books_list').columnInfo('Query_id')).type).to.be.oneOf([
+                    'integer',
+                    'int',
+                ]);
+                expect(
+                    (await knex('__Query_books_list').columnInfo('Query_books_Book_id')).type
+                ).to.be.oneOf(['integer', 'int']);
             });
         });
         Scenario(
@@ -433,22 +443,43 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                         'character varying',
                     ]);
                 });
-                And(
-                    'tipų kurie yra tevų objiekte kaip sąrašas lentelės turi turėti svetimus tėvų raktų stulpelius',
-                    async () => {
-                        expect(await knex.schema.hasColumn('Book', 'Query_books_id')).to.be.true;
-                        expect(await knex.schema.hasColumn('Author', 'Book_author_id')).to.be.true;
-                    }
-                );
+                And('objiektų sąrašo tipo esybės turi tureti savo lenteles', async () => {
+                    expect(await knex.schema.hasTable('__Query_books_list')).to.be.true;
+                    expect(await knex.schema.hasTable('__Book_author_list')).to.be.true;
+                });
+                And('jie turi turėti tesingus stulpelius', async () => {
+                    expect(await knex.schema.hasColumn('__Query_books_list', 'id')).to.be.true;
+                    expect(await knex.schema.hasColumn('__Query_books_list', 'Query_id')).to.be
+                        .true;
+                    expect(await knex.schema.hasColumn('__Query_books_list', 'Query_books_Book_id'))
+                        .to.be.true;
+                    expect(await knex.schema.hasColumn('__Book_author_list', 'id')).to.be.true;
+                    expect(await knex.schema.hasColumn('__Book_author_list', 'Book_id')).to.be.true;
+                    expect(
+                        await knex.schema.hasColumn('__Book_author_list', 'Book_author_Author_id')
+                    ).to.be.true;
+                });
                 And('jų tipai turi būti teisingi', async () => {
-                    expect((await knex('Book').columnInfo('Query_books_id')).type).to.be.oneOf([
+                    expect((await knex('__Query_books_list').columnInfo('id')).type).to.be.oneOf([
                         'integer',
                         'int',
                     ]);
-                    expect((await knex('Author').columnInfo('Book_author_id')).type).to.be.oneOf([
+                    expect(
+                        (await knex('__Query_books_list').columnInfo('Query_id')).type
+                    ).to.be.oneOf(['integer', 'int']);
+                    expect(
+                        (await knex('__Query_books_list').columnInfo('Query_books_Book_id')).type
+                    ).to.be.oneOf(['integer', 'int']);
+                    expect((await knex('__Book_author_list').columnInfo('id')).type).to.be.oneOf([
                         'integer',
                         'int',
                     ]);
+                    expect(
+                        (await knex('__Book_author_list').columnInfo('Book_id')).type
+                    ).to.be.oneOf(['integer', 'int']);
+                    expect(
+                        (await knex('__Book_author_list').columnInfo('Book_author_Author_id')).type
+                    ).to.be.oneOf(['integer', 'int']);
                 });
             }
         );

@@ -7,16 +7,17 @@ export async function buildScalarListField(
     listType: GraphQLScalarType,
     objectTypeName: string,
     name: string,
-    knex: Knex
+    knex: Knex,
+    valueFieldName = 'value',
+    parentKeyName = `${objectTypeName}_${name}_id`
 ): Promise<void> {
-    const foreignKey = `${objectTypeName}_${name}_id`;
     const tableName = `__${objectTypeName}_${name}_list`;
     await knex.schema.createTable(tableName, (tableBuilder) => {
         tableBuilder.increments('id').unsigned();
         buildScalarFields({
             scalarFieldTypeMap: {
-                value: listType,
-                [foreignKey]: GraphQLID,
+                [valueFieldName]: listType,
+                [parentKeyName]: GraphQLID,
             },
             tableBuilder,
         });

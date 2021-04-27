@@ -2,7 +2,7 @@ import { GraphQLObjectType, GraphQLScalarType } from 'graphql';
 import Knex from 'knex';
 import { buildScalarListField } from './buildScalarListField';
 
-export async function buildListScalarFieldTables(
+export async function buildScalarListTables(
     listScalarFieldTypeMap: Record<string, GraphQLScalarType>,
     objectType: GraphQLObjectType,
     knex: Knex

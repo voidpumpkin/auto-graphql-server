@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import Knex from 'knex';
-import { GraphQLSchema, isObjectType } from 'graphql';
+import { GraphQLObjectType, GraphQLSchema, isObjectType } from 'graphql';
 
 import { generateTables } from './generateTables';
 import { log } from '../logger';
+import { NO_TABLE } from '../directives';
 
 export async function generateDatabase({
     sourceSchema,
@@ -36,12 +37,13 @@ export async function generateDatabase({
     }
 
     const schemaTypeMap = sourceSchema.getTypeMap();
-    const objectTypeNames = Object.entries(schemaTypeMap)
-        .filter(
-            ([key, val]) => isObjectType(val) && key.substr(0, 2) !== '__' && key !== 'Mutation'
-        )
-        .map(([key]) => key);
-    const doesDbAlreadyExist = await knex.schema.hasTable(objectTypeNames[0]);
+    const objectTypes = Object.values(schemaTypeMap).filter(
+        (type) =>
+            isObjectType(type) &&
+            type.name.substr(0, 2) !== '__' &&
+            !type.astNode?.directives?.some((d) => d.name.value === NO_TABLE)
+    ) as GraphQLObjectType[];
+    const doesDbAlreadyExist = await knex.schema.hasTable(objectTypes[0].name);
 
     if (doesDbAlreadyExist && (config.skipDbCreationIfExists ?? true)) {
         (await import('../logger')).log(
@@ -65,6 +67,6 @@ export async function generateDatabase({
         knex = Knex(config.database);
     }
 
-    await generateTables({ objectTypeNames, knex, schemaTypeMap });
+    await generateTables({ objectTypes, knex });
     return knex;
 }

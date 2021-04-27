@@ -6,52 +6,49 @@ import {
     GraphQLScalarType,
 } from 'graphql';
 import Knex from 'knex';
-import { TypeMap } from '@graphql-tools/utils';
 
 import { buildObjectFields } from './buildObjectFields';
 import { buildScalarFields } from './buildScalarFields';
-import { recursivelyGetAllFieldTypeEntries } from './recursivelyGetAllFieldTypeEntries';
+import { recursivelyGetAllFields } from './recursivelyGetAllFields';
 import { updateForeignKeyConstraints } from './updateForeignKeyConstraints';
-import { buildListScalarFieldTables } from './buildListScalarFieldTables';
+import { buildScalarListTables } from './buildScalarListTables';
+import { buildObjectListTables } from './buildObjectListTables';
+import { NO_TABLE } from '../directives';
 
 export async function generateTables({
-    objectTypeNames,
+    objectTypes,
     knex,
-    schemaTypeMap,
 }: {
-    objectTypeNames: string[];
+    objectTypes: GraphQLObjectType[];
     knex: Knex;
-    schemaTypeMap: TypeMap;
 }): Promise<void> {
-    const prepedDataList = objectTypeNames.map((objectTypeName) => {
-        const objectType = schemaTypeMap[objectTypeName];
-        if (!isObjectType(objectType)) {
-            throw Error('Not object type');
-        }
-        const fieldTypeEntries = recursivelyGetAllFieldTypeEntries(objectType);
+    const prepedDataList = objectTypes.map((objectType) => {
+        const fieldTypes = recursivelyGetAllFields({ type: objectType });
         const scalarFieldTypeMap: Record<string, GraphQLScalarType> = {};
         const objectFieldTypeMap: Record<string, GraphQLObjectType> = {};
         const listScalarFieldTypeMap: Record<string, GraphQLScalarType> = {};
         const listObjectFieldTypeMap: Record<string, GraphQLObjectType> = {};
 
-        for (const [key, type] of fieldTypeEntries) {
-            if (isScalarType(type) && key !== 'id') {
-                scalarFieldTypeMap[key] = type;
+        for (const { name, type, astNode } of fieldTypes) {
+            if (isScalarType(type) && name !== 'id') {
+                scalarFieldTypeMap[name] = type;
             } else if (isObjectType(type)) {
-                objectFieldTypeMap[key] = type;
+                objectFieldTypeMap[name] = type;
             } else if (isListType(type)) {
                 if (isScalarType(type.ofType)) {
-                    listScalarFieldTypeMap[key] = type.ofType;
+                    listScalarFieldTypeMap[name] = type.ofType;
                 } else if (isObjectType(type.ofType)) {
-                    listObjectFieldTypeMap[key] = type.ofType;
+                    if (!astNode?.directives?.some((d) => d.name.value === NO_TABLE)) {
+                        listObjectFieldTypeMap[name] = type.ofType;
+                    }
                 }
             }
         }
         return {
             scalarFieldTypeMap,
             objectFieldTypeMap,
-            listScalarFieldTypeMap,
             listObjectFieldTypeMap,
+            listScalarFieldTypeMap,
             objectType,
         };
     });
@@ -62,12 +59,14 @@ export async function generateTables({
                 scalarFieldTypeMap,
                 objectFieldTypeMap,
                 listScalarFieldTypeMap,
+                listObjectFieldTypeMap,
                 objectType,
             }) => {
                 if (
                     !!Object.keys(scalarFieldTypeMap).length &&
                     !!Object.keys(objectFieldTypeMap).length &&
-                    !!Object.keys(listScalarFieldTypeMap).length
+                    !!Object.keys(listScalarFieldTypeMap).length &&
+                    !!Object.keys(listObjectFieldTypeMap).length
                 ) {
                     return;
                 }
@@ -76,7 +75,8 @@ export async function generateTables({
                     buildScalarFields({ scalarFieldTypeMap, tableBuilder });
                     buildObjectFields({ objectFieldTypeMap, tableBuilder });
                 });
-                await buildListScalarFieldTables(listScalarFieldTypeMap, objectType, knex);
+                await buildScalarListTables(listScalarFieldTypeMap, objectType, knex);
+                await buildObjectListTables(listObjectFieldTypeMap, objectType, knex);
             }
         )
     );
@@ -92,7 +92,7 @@ export async function generateTables({
                 if (
                     !!Object.keys(objectFieldTypeMap).length &&
                     !!Object.keys(listScalarFieldTypeMap).length &&
-                    !!Object.keys(listObjectFieldTypeMap).length
+                    !!Object.keys(listScalarFieldTypeMap).length
                 ) {
                     return;
                 }

@@ -4,46 +4,45 @@ import { IResolvers } from '@graphql-tools/utils';
 import { GraphQLSchema } from 'graphql';
 import { createObjectTypeFieldResolver } from './createObjectTypeFieldResolver';
 import { createListTypeFieldResolver } from './createListTypeFieldResolver';
+import { recursivelyGetAllFields } from '../generateDatabase/recursivelyGetAllFields';
 
 export function getQueryResolvers(sourceSchema: GraphQLSchema, knex: Knex): IResolvers {
     const resolvers: IResolvers = {};
     const schemaTypeMap = sourceSchema.getTypeMap();
-    const objectTypesNames = Object.entries(schemaTypeMap)
-        .filter(([key, val]) => isObjectType(val) && key.substr(0, 2) !== '__')
-        .map(([, val]) => val as GraphQLObjectType);
+    const objectTypes = Object.values(schemaTypeMap).filter(
+        (type) => isObjectType(type) && type.name.substr(0, 2) !== '__'
+    ) as GraphQLObjectType[];
     const queryType = sourceSchema.getQueryType();
     if (!queryType) {
         throw Error('QueryType not defined');
     }
-    const queryTypeName = queryType.name;
-
-    objectTypesNames.map((objectType) => {
+    objectTypes.map((objectType) => {
         resolvers[objectType.name] = {};
 
-        Object.entries(objectType.getFields()).forEach(([fieldName, field]) => {
-            const fieldType = field.type;
-            if (isListType(fieldType)) {
+        const objectFields = recursivelyGetAllFields({ type: objectType });
+        objectFields.forEach(({ name, type }) => {
+            if (isListType(type)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 //@ts-ignore
-                resolvers[objectType.name][fieldName] = createListTypeFieldResolver(
+                resolvers[objectType.name][name] = createListTypeFieldResolver(
                     knex,
-                    fieldType,
-                    queryTypeName
+                    type,
+                    queryType.name
                 );
             }
-            if (isObjectType(fieldType)) {
+            if (isObjectType(type)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 //@ts-ignore
-                resolvers[objectType.name][fieldName] = createObjectTypeFieldResolver(
+                resolvers[objectType.name][name] = createObjectTypeFieldResolver(
                     knex,
-                    fieldType,
-                    queryTypeName
+                    type,
+                    queryType.name
                 );
             }
-            if (isScalarType(fieldType)) {
+            if (isScalarType(type)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 //@ts-ignore
-                resolvers[objectType.name][fieldName] = async (root, _, __, info) => {
+                resolvers[objectType.name][name] = async (root, _, __, info) => {
                     if (root?.hasOwnProperty(info.fieldName)) {
                         return root[info.fieldName];
                     }

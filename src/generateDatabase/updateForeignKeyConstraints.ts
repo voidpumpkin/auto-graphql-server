@@ -32,9 +32,12 @@ export async function updateForeignKeyConstraints({
     );
     await Promise.all(
         Object.entries(listObjectFieldTypeMap).map(async ([name, type]) => {
-            const foreignKey = `${objectType.name}_${name}_id`;
-            await knex.schema.alterTable(type.name, (tableBuilder) => {
-                tableBuilder.foreign(foreignKey).references(`${objectType.name}.id`);
+            const parentForeignKey = `${objectType.name}_id`;
+            const listTypeIdForeignKey = `${objectType.name}_${name}_${type.name}_id`;
+            const tableName = `__${objectType.name}_${name}_list`;
+            await knex.schema.alterTable(tableName, (table) => {
+                table.foreign(listTypeIdForeignKey).references(`${type.name}.id`);
+                table.foreign(parentForeignKey).references(`${objectType.name}.id`);
             });
         })
     );
