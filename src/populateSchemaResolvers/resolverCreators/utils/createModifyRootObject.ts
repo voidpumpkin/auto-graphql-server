@@ -1,7 +1,11 @@
 import { GraphQLType, isEqualType } from 'graphql';
 import Knex from 'knex';
 
-type ModifyRootObject = (info: AnyRecord, root: AnyRecord, knex: Knex) => Promise<AnyRecord>;
+type ModifyRootObject = (
+    info: Record<string, all>,
+    root: Record<string, all>,
+    knex: Knex
+) => Promise<Record<string, all>>;
 
 export function createModifyRootObject(
     queryTypeName: string,

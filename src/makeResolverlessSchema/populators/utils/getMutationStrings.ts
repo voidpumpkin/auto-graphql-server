@@ -2,6 +2,7 @@ import { isScalarType, GraphQLObjectType, isListType } from 'graphql';
 import { NO_TABLE, PARENTS_LIST } from '../../../directives/directives';
 import { getParentFieldValue } from '../../../directives/getParentFieldValue';
 import { getParentListDirective } from '../../../directives/getParentListDirective';
+import { GRAPHQL_ID } from '../../../utils/graphqlConstants';
 import { toSentenceCase } from '../../../utils/toSentenceCase';
 
 export const defaultInputArg: ArgData = {
@@ -17,7 +18,7 @@ const defaultFilterArg: ArgData = {
 const defaultMutationData = {
     add: { args: [defaultInputArg] },
     update: { args: [defaultFilterArg, defaultInputArg], returnsList: true },
-    remove: { args: [defaultFilterArg], returnsList: true },
+    remove: { args: [defaultFilterArg], returnsList: true, returnType: GRAPHQL_ID },
 };
 
 type ArgData = {
@@ -29,6 +30,7 @@ type ArgData = {
 type MutationData = {
     args: ArgData[];
     returnsList?: boolean;
+    returnType?: string;
 };
 
 export function getMutationStrings(
@@ -50,16 +52,16 @@ export function getMutationStrings(
                 mutationListFields += `${name}: [${ofType.name}] `;
             } else if (parentListDirective) {
                 const parentFieldArgValue = getParentFieldValue(parentListDirective);
-                mutationListFields += `${name}: [ID] @${PARENTS_LIST}(parentField: "${parentFieldArgValue}") `;
+                mutationListFields += `${name}: [${GRAPHQL_ID}] @${PARENTS_LIST}(parentField: "${parentFieldArgValue}") `;
             } else if (!astNode?.directives?.some((d) => d.name.value === NO_TABLE)) {
-                mutationListFields += `${name}: [ID] `;
+                mutationListFields += `${name}: [${GRAPHQL_ID}] `;
             }
         } else {
-            mutationNonListFields += `${name}: ID `;
+            mutationNonListFields += `${name}: ${GRAPHQL_ID} `;
         }
     });
 
-    Object.entries(mutationsData).forEach(([mutationMethod, { args, returnsList }]) => {
+    Object.entries(mutationsData).forEach(([mutationMethod, { args, returnsList, returnType }]) => {
         const isValid = args.reduce((acc, { disAllowListFields }) => {
             if (disAllowListFields && !mutationNonListFields) {
                 return false;
@@ -76,8 +78,9 @@ export function getMutationStrings(
             ({ name, typeNameEnding }) =>
                 `${name}: ${toSentenceCase(mutationName)}${typeNameEnding}`
         );
-        const returnType = returnsList ? `[${namedType.name}]` : namedType.name;
-        rootMutationFields += `${mutationName}(${argStrings.join(' , ')}): ${returnType} `;
+        const returnLowerType = returnType ? 'ID' : namedType.name;
+        const returnFinalType = returnsList ? `[${returnLowerType}]` : returnLowerType;
+        rootMutationFields += `${mutationName}(${argStrings.join(' , ')}): ${returnFinalType} `;
 
         const argsInputTypes = args.reduce((prev, { typeNameEnding, disAllowListFields }) => {
             const fields = disAllowListFields

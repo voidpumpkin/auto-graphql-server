@@ -704,8 +704,8 @@ Feature('👓Duomenų skaitymo operacijos', async () => {
                 query.should.exist;
             });
             And(`duomenų bazėje yra 2 Query id`, async () => {
-                await knex('__Query_ids_list').insert({ value: 1, Query_ids_id: 1 });
-                await knex('__Query_ids_list').insert({ value: 2, Query_ids_id: 1 });
+                await knex('__Query_ids_list').insert({ value: 1, Query_id: 1 });
+                await knex('__Query_ids_list').insert({ value: 2, Query_id: 1 });
             });
             When('atsakymas gražinamas', async () => {
                 response = await request(app.listen())

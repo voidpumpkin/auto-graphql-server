@@ -375,7 +375,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
             And('duomenų bazėje turėtų būti nauji duomenys', async () => {
                 (
                     await knex('__Book_authors_list')
-                        .where({ value: 'Bob', ['Book_authors_id']: 1 })
+                        .where({ value: 'Bob', ['Book_id']: 1 })
                         .first()
                 ).should.be.ok;
             });

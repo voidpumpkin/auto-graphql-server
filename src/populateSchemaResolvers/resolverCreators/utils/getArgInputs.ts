@@ -1,13 +1,13 @@
-type listInputs = AnyRecord;
-type nonListInputs = AnyRecord;
+type listInputs = Record<string, all>;
+type nonListInputs = Record<string, all>;
 
 export function getArgInputs(
-    argObject: AnyRecord,
-    listFields: AnyRecord,
-    nonListFields: AnyRecord
+    argObject: Record<string, all>,
+    listFields: Record<string, all>,
+    nonListFields: Record<string, all>
 ): [nonListInputs, listInputs] {
-    const nonListInputs: AnyRecord = {};
-    const listInputs: AnyRecord = {};
+    const nonListInputs: Record<string, all> = {};
+    const listInputs: Record<string, all> = {};
 
     for (const inputName in argObject) {
         if (listFields.hasOwnProperty(inputName)) {

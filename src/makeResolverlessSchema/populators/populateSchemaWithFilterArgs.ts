@@ -56,8 +56,7 @@ export function populateSchemaWithFilterArgs(schema: GraphQLSchema): GraphQLSche
     return schemaWithFilterArgs;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getObjectTypeInputFields(fields: GraphQLField<any, any>[]): string {
+function getObjectTypeInputFields(fields: GraphQLField<all, all>[]): string {
     return fields.reduce((acc, { name, type }) => {
         if (isScalarType(type)) {
             return `${acc} ${name}: ${type.name}`;

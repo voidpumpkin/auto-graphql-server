@@ -1,6 +1,5 @@
 import { IResolvers } from '@graphql-tools/utils';
 import Knex from 'knex';
-
 export function getCustomResolvers(
     customResolverBuilderMap: CustomResolverBuilderMap,
     knex: Knex

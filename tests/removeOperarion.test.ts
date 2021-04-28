@@ -15,7 +15,7 @@ should();
 Feature('🧹Duomenų trynimo operacijos', async () => {
     Scenario('Trinti Query', async () => {
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeQuery() { id } }`;
+        const query = `mutation { removeQuery }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
@@ -47,10 +47,10 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
             }
         );
     });
-    Scenario('Schemos Book tipas turi ID skaliarą', async () => {
+    Scenario('Trinti be filtrų', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {id: "1"}) { id } }`;
+        const query = `mutation { removeBook }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
@@ -83,17 +83,60 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         });
         Then('atsakymo kūnas turėtų turėti teisingą id', async () => {
             response.body.should.deep.equal({
-                data: { removeBook: [{ id: '1' }] },
+                data: { removeBook: ['1'] },
             });
         });
         And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
             (await knex('Book').where({ id: '1' })).length.should.not.be.ok;
         });
     });
-    Scenario('Schemos Book tipas turi String skaliarą', async () => {
+    Scenario('Trinti pagal ID skaliarą', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
+        const query = `mutation { removeBook(filter: {id: "1"}) }`;
+        let response: request.Response;
+        before(async () => {
+            await createDBClient();
+            const creationResult = await createApp({
+                config,
+                typeDefs:
+                    'schema { query: Query } type Query { book: Book } type Book { identification: ID }',
+            });
+            app = creationResult.app;
+            knex = creationResult.knex;
+            await knex('Book').insert({});
+        });
+
+        after(async () => {
+            await removeDBClient();
+        });
+
+        Given(`užklausai "${query}"`, () => {
+            query.should.exist;
+        });
+        And('Book su id 1 jau yra duomenų bazėje', async () => {
+            (await knex('Book').where({ id: 1 }).first()).should.be.ok;
+        });
+        When('atsakymas gražinamas', async () => {
+            response = await request(app.listen())
+                .post(`/`)
+                .set('Accept', 'application/json')
+                .send({ query });
+            response.status.should.be.equal(200);
+        });
+        Then('atsakymo kūnas turėtų turėti teisingą id', async () => {
+            response.body.should.deep.equal({
+                data: { removeBook: ['1'] },
+            });
+        });
+        And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
+            (await knex('Book').where({ id: '1' })).length.should.not.be.ok;
+        });
+    });
+    Scenario('Trinti pagal String skaliarą', async () => {
+        let knex: Knex;
+        let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+        const query = `mutation { removeBook(filter: {name: "1"}) }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
@@ -126,17 +169,17 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         });
         Then('atsakymo kūnas turėtų turėti teisingą name', async () => {
             response.body.should.deep.equal({
-                data: { removeBook: [{ name: '1' }] },
+                data: { removeBook: ['1'] },
             });
         });
         And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
             (await knex('Book').where({ name: '1' })).length.should.not.be.ok;
         });
     });
-    Scenario('Schemos Book tipas turi Boolean skaliarą', async () => {
+    Scenario('Trinti pagal Boolean skaliarą', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {readable: true}) { readable } }`;
+        const query = `mutation { removeBook(filter: {readable: true}) }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
@@ -169,17 +212,17 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         });
         Then('atsakymo kūnas turėtų turėti teisingą readable', async () => {
             response.body.should.deep.equal({
-                data: { removeBook: [{ readable: true }] },
+                data: { removeBook: ['1'] },
             });
         });
         And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
             (await knex('Book').where({ readable: true })).length.should.not.be.ok;
         });
     });
-    Scenario('Schemos Book tipas turi Int skaliarą', async () => {
+    Scenario('Trinti pagal Int skaliarą', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {pages: 5}) { pages } }`;
+        const query = `mutation { removeBook(filter: {pages: 5}) }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
@@ -212,17 +255,17 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         });
         Then('atsakymo kūnas turėtų turėti teisingą pages', async () => {
             response.body.should.deep.equal({
-                data: { removeBook: [{ pages: 5 }] },
+                data: { removeBook: ['1'] },
             });
         });
         And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
             (await knex('Book').where({ pages: 5 })).length.should.not.be.ok;
         });
     });
-    Scenario('Schemos Book tipas turi Float skaliarą', async () => {
+    Scenario('Trinti pagal Float skaliarą', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {probability: 0.3}) { probability } }`;
+        const query = `mutation { removeBook(filter: {probability: 0.3}) }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
@@ -255,17 +298,17 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         });
         Then('atsakymo kūnas turėtų turėti teisingą probability', async () => {
             response.body.should.deep.equal({
-                data: { removeBook: [{ probability: 0.3 }] },
+                data: { removeBook: ['1'] },
             });
         });
         And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
             (await knex('Book').where({ probability: 0.3 })).length.should.not.be.ok;
         });
     });
-    Scenario('Trinti 2 vienodus Book', async () => {
+    Scenario('Trinti kai yra 2 trinamieji', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {name: "1"}) { name } }`;
+        const query = `mutation { removeBook(filter: {name: "1"}) }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
@@ -299,43 +342,59 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         });
         Then('atsakymo kūnas turėtų turėti teisingą atsakymą', async () => {
             response.body.should.deep.equal({
-                data: { removeBook: [{ name: '1' }, { name: '1' }] },
+                data: { removeBook: ['1', '2'] },
             });
         });
         And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
             (await knex('Book').where({ name: '1' })).length.should.not.be.ok;
         });
     });
-    Scenario('Schemos Book tipas turi objiektą Author', async () => {
+    Scenario('Trinti kai trinamieji turi objiektų sąrašo esybę', async () => {
         let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {author: "1"}) { author { name } } }`;
+        const query = `mutation { removeBook }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
-                    'schema { query: Query } type Query { book: Book } type Book { author: Author } type Author { name: String }',
+                    'schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }',
             });
             app = creationResult.app;
             knex = creationResult.knex;
-            await knex('Author').insert({ name: 'bob' });
-            await knex('Book').insert({ author: '1' });
+            await knex('Book').insert({});
+            await knex('Author').insert({ name: 'Sam' });
+            await knex('Author').insert({ name: 'Bob' });
+            await knex('__Book_authors_list').insert({ Book_id: 1, Book_authors_Author_id: 1 });
+            await knex('__Book_authors_list').insert({ Book_id: 1, Book_authors_Author_id: 2 });
         });
 
         after(async () => {
             await removeDBClient();
         });
 
-        Given(`užklausai "${query}"`, () => {
+        Given('duomenų bazėje 1 Book', async () => {
+            (await knex('Book').where({ id: 1 }).first()).should.be.ok;
+        });
+        And('2 Authoriams', async () => {
+            (await knex('Author').where({ name: 'Sam' }).first()).should.be.ok;
+            (await knex('Author').where({ name: 'Bob' }).first()).should.be.ok;
+        });
+        And('jie yra Book authors sąraše', async () => {
+            (
+                await knex('__Book_authors_list')
+                    .where({ Book_id: 1, Book_authors_Author_id: 1 })
+                    .first()
+            ).should.be.ok;
+            (
+                await knex('__Book_authors_list')
+                    .where({ Book_id: 1, Book_authors_Author_id: 2 })
+                    .first()
+            ).should.be.ok;
+        });
+        And(`užklausai "${query}"`, () => {
             query.should.exist;
-        });
-        And('Book jau yra duomenų bazėje', async () => {
-            (await knex('Book').where({ author: '1' }).first()).should.be.ok;
-        });
-        And('Author jau yra duomenų bazėje', async () => {
-            (await knex('Author').where({ name: 'bob' }).first()).should.be.ok;
         });
         When('atsakymas gražinamas', async () => {
             response = await request(app.listen())
@@ -346,32 +405,47 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
         });
         Then('atsakymo kūnas turėtų turėti teisingą atsakymą', async () => {
             response.body.should.deep.equal({
-                data: { removeBook: [{ author: { name: 'bob' } }] },
+                data: { removeBook: ['1'] },
             });
         });
         And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
-            (await knex('Book').where({ author: 1 })).length.should.not.be.ok;
+            (await knex('Book').select()).length.should.not.be.ok;
+            (await knex('__Book_authors_list').where({ Book_id: 1 })).length.should.not.be.ok;
         });
     });
-    Scenario('Schemos Book tipas turi sąrašą Author', async () => {
+    Scenario('Trinti kai trinamieji turi skaliarų sąrašo esybę', async () => {
+        let knex: Knex;
         let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-        const query = `mutation { removeBook(filter: {authors: ["1"]}) { authors { name } } }`;
+        const query = `mutation { removeBook }`;
         let response: request.Response;
         before(async () => {
             await createDBClient();
             const creationResult = await createApp({
                 config,
                 typeDefs:
-                    'schema { query: Query } type Query { book: Book } type Book { authors: [Author] } type Author { name: String }',
+                    'schema { query: Query } type Query { book: Book } type Book { authors: [String] }',
             });
             app = creationResult.app;
+            knex = creationResult.knex;
+            await knex('Book').insert({});
+            await knex('__Book_authors_list').insert({ value: 'Sam', Book_id: 1 });
+            await knex('__Book_authors_list').insert({ value: 'Bob', Book_id: 1 });
         });
 
         after(async () => {
             await removeDBClient();
         });
 
-        Given(`užklausai "${query}"`, () => {
+        Given('duomenų bazėje 1 Book', async () => {
+            (await knex('Book').where({ id: 1 }).first()).should.be.ok;
+        });
+        And('jo authors sąraše yra 2 laukai', async () => {
+            (await knex('__Book_authors_list').where({ value: 'Sam', Book_id: 1 }).first()).should
+                .be.ok;
+            (await knex('__Book_authors_list').where({ value: 'Bob', Book_id: 1 }).first()).should
+                .be.ok;
+        });
+        And(`užklausai "${query}"`, () => {
             query.should.exist;
         });
         When('atsakymas gražinamas', async () => {
@@ -379,13 +453,16 @@ Feature('🧹Duomenų trynimo operacijos', async () => {
                 .post(`/`)
                 .set('Accept', 'application/json')
                 .send({ query });
-            response.status.should.be.equal(400);
+            response.status.should.be.equal(200);
         });
-        Then(
-            'atsakymo kūnas turėtų turėti klaidų, nes trynimo operacija pagal sąrašą draudžiama',
-            async () => {
-                response.body.errors.length.should.be.ok;
-            }
-        );
+        Then('atsakymo kūnas turėtų turėti teisingą atsakymą', async () => {
+            response.body.should.deep.equal({
+                data: { removeBook: ['1'] },
+            });
+        });
+        And('duomenų bazėje turėtų būti ištrinti duomenys', async () => {
+            (await knex('Book').select()).length.should.not.be.ok;
+            (await knex('__Book_authors_list').where({ Book_id: 1 })).length.should.not.be.ok;
+        });
     });
 });

@@ -11,8 +11,7 @@ export function createAddResolver(
     nonListFields: GraphQLNotListTypeFieldMap,
     knex: Knex,
     queryTypeName: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): IFieldResolver<any, any> {
+): IFieldResolver<all, all> {
     return async (_, args, __, info) => {
         const returnType = info.returnType;
         if (!isObjectType(returnType)) {
@@ -28,8 +27,7 @@ export function createAddResolver(
         await Promise.all(
             Object.entries(listInputs).map(async ([inputName, valueList]) =>
                 Promise.all(
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    valueList.map(async (value: any) => {
+                    valueList.map(async (value: all) => {
                         const parentListDirective = getParentListDirective(
                             listFields[inputName].astNode
                         );
@@ -67,7 +65,7 @@ export function createAddResolver(
         );
         const returnResolver = createObjectTypeFieldResolver(
             knex,
-            returnType,
+            { type: returnType } as GraphQLObjectTypeField,
             queryTypeName,
             insertResultId
         );
@@ -92,8 +90,8 @@ async function insertObjectListValues(
 
 async function insertScalarListValue(
     knex: Knex,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    value: any,
+
+    value: all,
     returnType: GraphQLObjectType,
     inputName: string,
     insertResultId: number
@@ -101,7 +99,7 @@ async function insertScalarListValue(
     const listTableName = `__${returnType.name}_${inputName}_list`;
     await knex(listTableName).insert({
         value,
-        [`${returnType.name}_${inputName}_id`]: insertResultId,
+        [`${returnType.name}_id`]: insertResultId,
     });
 }
 

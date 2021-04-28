@@ -232,12 +232,8 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                         .true;
                     expect(await knex.schema.hasColumn('__Query_probabilities_list', 'value')).to.be
                         .true;
-                    expect(
-                        await knex.schema.hasColumn(
-                            '__Query_probabilities_list',
-                            'Query_probabilities_id'
-                        )
-                    ).to.be.true;
+                    expect(await knex.schema.hasColumn('__Query_probabilities_list', 'Query_id')).to
+                        .be.true;
                 }
             );
             And('jų tipai turi būti teisingi', async () => {
@@ -248,8 +244,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     (await knex('__Query_probabilities_list').columnInfo('value')).type
                 ).to.be.oneOf(['float', 'real']);
                 expect(
-                    (await knex('__Query_probabilities_list').columnInfo('Query_probabilities_id'))
-                        .type
+                    (await knex('__Query_probabilities_list').columnInfo('Query_id')).type
                 ).to.be.oneOf(['integer', 'int']);
             });
         });
@@ -288,22 +283,14 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                         .true;
                     expect(await knex.schema.hasColumn('__Query_probabilities_list', 'value')).to.be
                         .true;
-                    expect(
-                        await knex.schema.hasColumn(
-                            '__Query_probabilities_list',
-                            'Query_probabilities_id'
-                        )
-                    ).to.be.true;
+                    expect(await knex.schema.hasColumn('__Query_probabilities_list', 'Query_id')).to
+                        .be.true;
                     expect(await knex.schema.hasColumn('__Query_executionResults_list', 'id')).to.be
                         .true;
                     expect(await knex.schema.hasColumn('__Query_executionResults_list', 'value')).to
                         .be.true;
-                    expect(
-                        await knex.schema.hasColumn(
-                            '__Query_executionResults_list',
-                            'Query_executionResults_id'
-                        )
-                    ).to.be.true;
+                    expect(await knex.schema.hasColumn('__Query_executionResults_list', 'Query_id'))
+                        .to.be.true;
                 }
             );
             And('jų tipai turi būti teisingi', async () => {
@@ -314,8 +301,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     (await knex('__Query_probabilities_list').columnInfo('value')).type
                 ).to.be.oneOf(['float', 'real']);
                 expect(
-                    (await knex('__Query_probabilities_list').columnInfo('Query_probabilities_id'))
-                        .type
+                    (await knex('__Query_probabilities_list').columnInfo('Query_id')).type
                 ).to.be.oneOf(['integer', 'int']);
                 expect(
                     (await knex('__Query_executionResults_list').columnInfo('id')).type
@@ -324,11 +310,7 @@ Feature('💽Duomenų bazės lentelių generavimas', async () => {
                     (await knex('__Query_executionResults_list').columnInfo('value')).type
                 ).to.be.oneOf(['boolean', 'tinyint']);
                 expect(
-                    (
-                        await knex('__Query_executionResults_list').columnInfo(
-                            'Query_executionResults_id'
-                        )
-                    ).type
+                    (await knex('__Query_executionResults_list').columnInfo('Query_id')).type
                 ).to.be.oneOf(['integer', 'int']);
             });
         });

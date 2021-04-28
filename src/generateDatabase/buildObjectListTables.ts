@@ -15,8 +15,7 @@ export async function buildObjectListTables(
                     objectType.name,
                     name,
                     knex,
-                    `${objectType.name}_${name}_${listType.name}_id`,
-                    `${objectType.name}_id`
+                    `${objectType.name}_${name}_${listType.name}_id`
                 )
         )
     );

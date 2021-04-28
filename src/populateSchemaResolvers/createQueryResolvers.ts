@@ -20,29 +20,30 @@ export function getQueryResolvers(sourceSchema: GraphQLSchema, knex: Knex): IRes
         resolvers[objectType.name] = {};
 
         const objectFields = recursivelyGetAllFields({ type: objectType });
-        objectFields.forEach(({ name, type }) => {
-            if (isListType(type)) {
+        objectFields.forEach((field) => {
+            if (isListType(field.type)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 //@ts-ignore
-                resolvers[objectType.name][name] = createListTypeFieldResolver(
+                resolvers[objectType.name][field.name] = createListTypeFieldResolver(
                     knex,
-                    type,
+                    field as GraphQLListTypeField,
+                    queryType.name,
+                    objectType
+                );
+            }
+            if (isObjectType(field.type)) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //@ts-ignore
+                resolvers[objectType.name][field.name] = createObjectTypeFieldResolver(
+                    knex,
+                    field as GraphQLObjectTypeField,
                     queryType.name
                 );
             }
-            if (isObjectType(type)) {
+            if (isScalarType(field.type)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 //@ts-ignore
-                resolvers[objectType.name][name] = createObjectTypeFieldResolver(
-                    knex,
-                    type,
-                    queryType.name
-                );
-            }
-            if (isScalarType(type)) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                //@ts-ignore
-                resolvers[objectType.name][name] = async (root, _, __, info) => {
+                resolvers[objectType.name][field.name] = async (root, _args, _ctx, info) => {
                     if (root?.hasOwnProperty(info.fieldName)) {
                         return root[info.fieldName];
                     }

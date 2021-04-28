@@ -23,7 +23,7 @@ export async function updateForeignKeyConstraints({
     );
     await Promise.all(
         Object.keys(listScalarFieldTypeMap).map(async (name) => {
-            const foreignKey = `${objectType.name}_${name}_id`;
+            const foreignKey = `${objectType.name}_id`;
             const tableName = `__${objectType.name}_${name}_list`;
             await knex.schema.alterTable(tableName, (table) => {
                 table.foreign(foreignKey).references(`${objectType.name}.id`);
