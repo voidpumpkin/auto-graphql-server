@@ -1,11 +1,10 @@
-import { isScalarType, isObjectType, isListType } from 'graphql';
+import { isObjectType, isListType } from 'graphql';
 import Knex from 'knex';
 import { IResolvers } from '@graphql-tools/utils';
 import { GraphQLSchema } from 'graphql';
-import { getArgInputs } from './resolverCreators/utils/getArgInputs';
-import { createModifyRootObject } from './resolverCreators/utils/createModifyRootObject';
 import { createAddResolver } from './resolverCreators/createAddResolver';
 import { createRemoveResolver } from './resolverCreators/createRemoveResolver';
+import { createUpdateResolver } from './resolverCreators/createUpdateResolver';
 
 export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): IResolvers {
     const resolvers: IResolvers = { Mutation: {} };
@@ -63,71 +62,15 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
             const isQueryType = returnTypeName === queryType.name;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
-            resolvers.Mutation[fieldName] = async (root, args, __, info) => {
-                const mutationType = info.schema.getMutationType();
-                const modifyRootObject = createModifyRootObject(
-                    queryTypeName,
-                    mutationTypeName,
-                    mutationType
-                );
-                root = await modifyRootObject(info, root, knex);
-                const [nonListInputs, listInputs] = getArgInputs(
-                    args.input,
-                    listFields,
-                    nonListFields
-                );
-                const queryWhere = isQueryType ? { id: root.id } : args?.filter;
-                if (!Object.keys(queryWhere).length) {
-                    throw Error('No filters provided');
-                }
-                const queryResults = await knex(returnTypeName).where(queryWhere).select('id');
-                const updatingRowIds = queryResults.map((e) => e.id);
-                if (Object.keys(nonListInputs).length) {
-                    await knex(returnTypeName).update(nonListInputs).whereIn('id', updatingRowIds);
-                }
-                await Promise.all(
-                    Object.entries(listInputs).map(async ([inputName, valueList]) => {
-                        const tableName = `__${returnTypeName}_${inputName}_list`;
-                        const relationshipName = `${returnTypeName}_${inputName}_id`;
-                        if (isScalarType(listFields[inputName].type.ofType)) {
-                            await knex(tableName)
-                                .where({ [relationshipName]: root.id })
-                                .delete();
-                            await valueList.reduce(
-                                async (prevPromise: Promise<void>, value: all) => {
-                                    await prevPromise;
-                                    await knex(tableName).insert({
-                                        value,
-                                        [relationshipName]: root.id,
-                                    });
-                                },
-                                Promise.resolve(undefined)
-                            );
-                        } else {
-                            await valueList.reduce(
-                                async (prevPromise: Promise<void>, value: all) => {
-                                    await prevPromise;
-                                    await knex(listFields[inputName].type.ofType.name)
-                                        .where({ id: value })
-                                        .update({
-                                            [`${returnTypeName}_${inputName}_id`]: root.id,
-                                        });
-                                },
-                                Promise.resolve(undefined)
-                            );
-                        }
-                    })
-                );
-                // const returnResolver = createListTypeFieldResolver(
-                //     knex,
-                //     info.returnType,
-                //     queryTypeName,
-                //     async (tableName) =>
-                //         await knex(tableName).select().whereIn('id', updatingRowIds)
-                // );
-                // const results = await returnResolver(root, undefined, undefined, info);
-                return null;
-            };
+            resolvers.Mutation[fieldName] = createUpdateResolver(
+                queryTypeName,
+                mutationTypeName,
+                knex,
+                listFields,
+                nonListFields,
+                isQueryType,
+                returnTypeName
+            );
         } else if (fieldName.startsWith('remove')) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
