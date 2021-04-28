@@ -1,9 +1,9 @@
 import { isScalarType, isObjectType, GraphQLList, GraphQLType } from 'graphql';
 import Knex from 'knex';
-import { createModifyRootObject } from './createModifyRootObject';
+import { createModifyRootObject } from './utils/createModifyRootObject';
 import { IFieldResolver } from 'graphql-tools';
-import { getSelections } from './getSelections';
-import { recursivelyGetAllFields } from '../generateDatabase/recursivelyGetAllFields';
+import { getSelections } from './utils/getSelections';
+import { recursivelyGetAllFields } from '../../generateDatabase/recursivelyGetAllFields';
 
 export function createListTypeFieldResolver(
     knex: Knex,

@@ -1,8 +1,8 @@
 import type Knex from 'knex';
 import type { IResolvers } from '@graphql-tools/utils';
 import type { GraphQLSchema } from 'graphql';
-import { getMutationResolvers } from './getMutationResolvers';
-import { getQueryResolvers } from './getQueryResolvers';
+import { getMutationResolvers } from './createMutationResolvers';
+import { getQueryResolvers } from './createQueryResolvers';
 import merge from 'lodash.merge';
 import { addResolversToSchema } from 'graphql-tools';
 import { getCustomResolvers } from './getCustomResolvers';

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import 'mocha-cakes-2';
 
-import { getResolverlessSchema } from '../src/getResolverlessSchema/getResolverlessSchema';
+import { makeResolverlessSchema } from '../src/makeResolverlessSchema/makeResolverlessSchema';
 
 Feature('🛑Schemos validacija', async () => {
     Feature('Schemos šakninio query tipo esybių pavadinimų validacijos', async () => {
@@ -9,7 +9,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getResolverlessSchema(`schema { book: Book } type Book { name: String }`);
+                    makeResolverlessSchema(`schema { book: Book } type Book { name: String }`);
             });
             Then(
                 'turi išmesti validavimo klaidą, nes book pavadinimas nėra leidžiamas šakninei esybei ',
@@ -22,7 +22,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getResolverlessSchema(
+                    makeResolverlessSchema(
                         `schema { subscription: Book } type Book { name: String }`
                     );
             });
@@ -37,7 +37,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getResolverlessSchema(`schema { query: Book } type Book { name: String }`);
+                    makeResolverlessSchema(`schema { query: Book } type Book { name: String }`);
             });
             Then(
                 'turi nemesti validavimo klaidos, nes query pavadinimas yra leidžiamas šakninei esybei ',
@@ -51,7 +51,7 @@ Feature('🛑Schemos validacija', async () => {
         Scenario('Nevalidus tipas ID', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
-                wrapedFunction = () => getResolverlessSchema(`schema { query: ID }`);
+                wrapedFunction = () => makeResolverlessSchema(`schema { query: ID }`);
             });
             Then(
                 'turi išmesti validavimo klaidą, nes tik objiekto tipas yra leidžiamas query esybei ',
@@ -63,7 +63,7 @@ Feature('🛑Schemos validacija', async () => {
         Scenario('Nevalidus tipas String', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
-                wrapedFunction = () => getResolverlessSchema(`schema { query: String }`);
+                wrapedFunction = () => makeResolverlessSchema(`schema { query: String }`);
             });
             Then(
                 'turi išmesti validavimo klaidą, nes tik objiekto tipas yra leidžiamas query esybei ',
@@ -75,7 +75,7 @@ Feature('🛑Schemos validacija', async () => {
         Scenario('Nevalidus tipas Int', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
-                wrapedFunction = () => getResolverlessSchema(`schema { query: Int }`);
+                wrapedFunction = () => makeResolverlessSchema(`schema { query: Int }`);
             });
             Then(
                 'turi išmesti validavimo klaidą, nes tik objiekto tipas yra leidžiamas query esybei ',
@@ -87,7 +87,7 @@ Feature('🛑Schemos validacija', async () => {
         Scenario('Nevalidus tipas Float', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
-                wrapedFunction = () => getResolverlessSchema(`schema { query: Float }`);
+                wrapedFunction = () => makeResolverlessSchema(`schema { query: Float }`);
             });
             Then(
                 'turi išmesti validavimo klaidą, nes tik objiekto tipas yra leidžiamas query esybei ',
@@ -99,7 +99,7 @@ Feature('🛑Schemos validacija', async () => {
         Scenario('Nevalidus tipas Boolean', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
-                wrapedFunction = () => getResolverlessSchema(`schema { query: Boolean }`);
+                wrapedFunction = () => makeResolverlessSchema(`schema { query: Boolean }`);
             });
             Then(
                 'turi išmesti validavimo klaidą, nes tik objiekto tipas yra leidžiamas query esybei ',
@@ -111,7 +111,7 @@ Feature('🛑Schemos validacija', async () => {
         Scenario('Nevalidus tipas skaliarų sąrašas', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
-                wrapedFunction = () => getResolverlessSchema(`schema { query: [Boolean] }`);
+                wrapedFunction = () => makeResolverlessSchema(`schema { query: [Boolean] }`);
             });
             Then(
                 'turi išmesti validavimo klaidą, nes tik objiekto tipas yra leidžiamas query esybei ',
@@ -124,7 +124,7 @@ Feature('🛑Schemos validacija', async () => {
             let wrapedFunction: () => void;
             When('validuojama schema', async () => {
                 wrapedFunction = () =>
-                    getResolverlessSchema(
+                    makeResolverlessSchema(
                         `schema { query: [Book] } type Book { identification: ID }`
                     );
             });

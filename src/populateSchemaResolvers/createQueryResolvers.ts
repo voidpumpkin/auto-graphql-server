@@ -2,8 +2,8 @@ import { isScalarType, isObjectType, isListType, GraphQLObjectType } from 'graph
 import Knex from 'knex';
 import { IResolvers } from '@graphql-tools/utils';
 import { GraphQLSchema } from 'graphql';
-import { createObjectTypeFieldResolver } from './createObjectTypeFieldResolver';
-import { createListTypeFieldResolver } from './createListTypeFieldResolver';
+import { createObjectTypeFieldResolver } from './resolverCreators/createObjectTypeFieldResolver';
+import { createListTypeFieldResolver } from './resolverCreators/createListTypeFieldResolver';
 import { recursivelyGetAllFields } from '../generateDatabase/recursivelyGetAllFields';
 
 export function getQueryResolvers(sourceSchema: GraphQLSchema, knex: Knex): IResolvers {

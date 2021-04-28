@@ -1,5 +1,11 @@
-import { KnexColumnType, KNEX_BOOL, KNEX_FLOAT, KNEX_INT, KNEX_STRING } from './knexConstants';
-import { GRAPHQL_INT, GRAPHQL_FLOAT, GRAPHQL_STRING, GRAPHQL_BOOL } from '../graphqlConstants';
+import {
+    KnexColumnType,
+    KNEX_BOOL,
+    KNEX_FLOAT,
+    KNEX_INT,
+    KNEX_STRING,
+} from '../generateDatabase/knexConstants';
+import { GRAPHQL_INT, GRAPHQL_FLOAT, GRAPHQL_STRING, GRAPHQL_BOOL } from './graphqlConstants';
 
 export const graphqlScalarToKnexTypeMap = {
     [GRAPHQL_INT]: KNEX_INT,

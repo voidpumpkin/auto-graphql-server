@@ -13,7 +13,7 @@ import { recursivelyGetAllFields } from './recursivelyGetAllFields';
 import { updateForeignKeyConstraints } from './updateForeignKeyConstraints';
 import { buildScalarListTables } from './buildScalarListTables';
 import { buildObjectListTables } from './buildObjectListTables';
-import { NO_TABLE } from '../directives';
+import { NO_TABLE, PARENTS_LIST } from '../directives/directives';
 
 export async function generateTables({
     objectTypes,
@@ -38,7 +38,11 @@ export async function generateTables({
                 if (isScalarType(type.ofType)) {
                     listScalarFieldTypeMap[name] = type.ofType;
                 } else if (isObjectType(type.ofType)) {
-                    if (!astNode?.directives?.some((d) => d.name.value === NO_TABLE)) {
+                    if (
+                        !astNode?.directives?.some((d) =>
+                            ([NO_TABLE, PARENTS_LIST] as string[]).includes(d.name.value)
+                        )
+                    ) {
                         listObjectFieldTypeMap[name] = type.ofType;
                     }
                 }

@@ -1,6 +1,6 @@
 import { createApp } from './createApp';
 import { readDataFiles } from './readDataFiles/readDataFiles';
-import { log } from './logger';
+import { log } from './utils/logger';
 
 (async () => {
     const { config, typeDefs, customResolverBuilderMap } = await readDataFiles();

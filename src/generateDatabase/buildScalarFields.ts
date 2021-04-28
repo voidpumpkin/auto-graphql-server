@@ -1,6 +1,6 @@
 import Knex from 'knex';
-import { getKnexColumnType } from './graphqlScalarToKnexTypeMap';
-import { GRAPHQL_ID } from '../graphqlConstants';
+import { getKnexColumnType } from '../utils/graphqlScalarToKnexTypeMap';
+import { GRAPHQL_ID } from '../utils/graphqlConstants';
 import { GraphQLScalarType } from 'graphql';
 
 export function buildScalarFields({

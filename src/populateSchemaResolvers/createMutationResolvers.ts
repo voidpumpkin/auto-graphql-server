@@ -2,10 +2,10 @@ import { isScalarType, isObjectType, isListType } from 'graphql';
 import Knex from 'knex';
 import { IResolvers } from '@graphql-tools/utils';
 import { GraphQLSchema } from 'graphql';
-import { getArgInputs } from './listInputs';
-import { createObjectTypeFieldResolver } from './createObjectTypeFieldResolver';
-import { createListTypeFieldResolver } from './createListTypeFieldResolver';
-import { createModifyRootObject } from './createModifyRootObject';
+import { getArgInputs } from './resolverCreators/utils/getArgInputs';
+import { createListTypeFieldResolver } from './resolverCreators/createListTypeFieldResolver';
+import { createModifyRootObject } from './resolverCreators/utils/createModifyRootObject';
+import { createAddResolver } from './resolverCreators/createAddResolver';
 
 export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): IResolvers {
     const resolvers: IResolvers = { Mutation: {} };
@@ -34,62 +34,25 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
             return;
         }
 
-        const listFields: AnyRecord = {};
-        const nonListFields: AnyRecord = {};
+        const listFields: GraphQLListTypeFieldMap = {};
+        const nonListFields: GraphQLNotListTypeFieldMap = {};
         returnTypeFields.forEach((field) => {
             if (isListType(field.type)) {
-                listFields[field.name] = field;
+                listFields[field.name] = field as GraphQLListTypeField;
             } else {
-                nonListFields[field.name] = field;
+                nonListFields[field.name] = field as GraphQLNotListTypeField;
             }
         });
 
         if (fieldName.startsWith('add')) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
-            resolvers.Mutation[fieldName] = async (_, args, __, info) => {
-                const [nonListInputs, listInputs] = getArgInputs(
-                    args.input,
-                    listFields,
-                    nonListFields
-                );
-
-                const insertResultIds = await knex(info.returnType.name)
-                    .returning('id')
-                    .insert(nonListInputs);
-
-                await Promise.all(
-                    Object.entries(listInputs).map(async ([inputName, valueList]) =>
-                        Promise.all(
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            valueList.map(async (value: any) => {
-                                if (isScalarType(listFields[inputName].type.ofType)) {
-                                    await knex(
-                                        `__${info.returnType.name}_${inputName}_list`
-                                    ).insert({
-                                        value,
-
-                                        [`${info.returnType.name}_${inputName}_id`]: insertResultIds[0],
-                                    });
-                                } else {
-                                    await knex(listFields[inputName].type.ofType.name)
-                                        .where({ id: value })
-                                        .update({
-                                            [`${info.returnType.name}_${inputName}_id`]: insertResultIds[0],
-                                        });
-                                }
-                            })
-                        )
-                    )
-                );
-                const returnResolver = createObjectTypeFieldResolver(
-                    knex,
-                    info.returnType,
-                    queryTypeName,
-                    insertResultIds[0]
-                );
-                return await returnResolver({}, undefined, undefined, info);
-            };
+            resolvers.Mutation[fieldName] = createAddResolver(
+                listFields,
+                nonListFields,
+                knex,
+                queryTypeName
+            );
         } else if (fieldName.startsWith('update')) {
             const isQueryType = returnTypeName === queryType.name;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment

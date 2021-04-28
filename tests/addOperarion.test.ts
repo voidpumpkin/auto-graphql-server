@@ -251,7 +251,7 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
         Scenario('Schemos Query tipas turi Book sąrašą', async () => {
             let knex: Knex;
             let app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-            const query = `mutation { addBook(input: {probability: 2.2, Query_books_id: "1"}) { probability } }`;
+            const query = `mutation { addBook(input: {probability: 2.2, Query_books_Query_list: "1"}) { probability } }`;
             let response: request.Response;
             before(async () => {
                 await createDBClient();
@@ -284,9 +284,10 @@ Feature('💾Duomenų pridėjimo operacijos', async () => {
                 });
             });
             And('duomenų bazėje turėtų būti nauji duomenys', async () => {
+                (await knex('Book').where({ probability: 2.2 }).first()).should.be.ok;
                 (
-                    await knex('Book')
-                        .where({ probability: 2.2, ['Query_books_id']: 1 })
+                    await knex('__Query_books_list')
+                        .where({ Query_books_Book_id: 1, Query_id: 1 })
                         .first()
                 ).should.be.ok;
             });

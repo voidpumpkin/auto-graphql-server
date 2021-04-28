@@ -7,7 +7,7 @@ import {
     isScalarType,
 } from 'graphql';
 import { mergeSchemas } from 'graphql-tools';
-import { toSentenceCase } from './toSentenceCase';
+import { toSentenceCase } from '../../utils/toSentenceCase';
 
 export function populateSchemaWithFilterArgs(schema: GraphQLSchema): GraphQLSchema {
     const schemaTypeMap = schema.getTypeMap();

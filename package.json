@@ -8,7 +8,7 @@
     "license": "MIT",
     "scripts": {
         "test": "ts-node ./tests/before.ts && yarn test-step-mocha && ts-node ./tests/after.ts",
-        "test-step-mocha": "mocha --recursive tests/ --extension test.only.ts --require ts-node/register --ui mocha-cakes-2  --exit --reporter mochawesome --timeout 0",
+        "test-step-mocha": "mocha --recursive tests/ --extension test.ts --require ts-node/register --ui mocha-cakes-2  --exit --reporter mochawesome --timeout 0",
         "cleaninstall": "rm -rf node_modules && yarn cache clean && yarn",
         "lint": "eslint ./src/**/* --ext .js,.ts --fix",
         "dev": "ts-node-dev --watch data/schema.graphql src",

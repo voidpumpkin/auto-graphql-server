@@ -1,5 +1,8 @@
 import { isScalarType, GraphQLObjectType, isListType } from 'graphql';
-import { toSentenceCase } from './toSentenceCase';
+import { NO_TABLE, PARENTS_LIST } from '../../../directives/directives';
+import { getParentFieldValue } from '../../../directives/getParentFieldValue';
+import { getParentListDirective } from '../../../directives/getParentListDirective';
+import { toSentenceCase } from '../../../utils/toSentenceCase';
 
 export const defaultInputArg: ArgData = {
     name: 'input',
@@ -37,14 +40,18 @@ export function getMutationStrings(
 
     let mutationNonListFields = '';
     let mutationListFields = '';
-    Object.values(namedType.getFields()).forEach(({ name, type }) => {
+    Object.values(namedType.getFields()).forEach(({ name, type, astNode }) => {
         if (isScalarType(type)) {
             mutationNonListFields += `${name}: ${type.name} `;
         } else if (isListType(type)) {
             const ofType = type.ofType;
+            const parentListDirective = getParentListDirective(astNode);
             if (isScalarType(ofType)) {
                 mutationListFields += `${name}: [${ofType.name}] `;
-            } else {
+            } else if (parentListDirective) {
+                const parentFieldArgValue = getParentFieldValue(parentListDirective);
+                mutationListFields += `${name}: [ID] @${PARENTS_LIST}(parentField: "${parentFieldArgValue}") `;
+            } else if (!astNode?.directives?.some((d) => d.name.value === NO_TABLE)) {
                 mutationListFields += `${name}: [ID] `;
             }
         } else {

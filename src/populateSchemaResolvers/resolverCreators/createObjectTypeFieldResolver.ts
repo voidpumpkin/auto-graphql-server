@@ -1,8 +1,8 @@
 import { GraphQLObjectType } from 'graphql';
 import Knex from 'knex';
 import { IFieldResolver } from 'graphql-tools';
-import { createModifyRootObject } from './createModifyRootObject';
-import { getSelections } from './getSelections';
+import { createModifyRootObject } from './utils/createModifyRootObject';
+import { getSelections } from './utils/getSelections';
 
 export function createObjectTypeFieldResolver(
     knex: Knex,

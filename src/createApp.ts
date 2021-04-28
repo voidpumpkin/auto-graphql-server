@@ -4,10 +4,10 @@ import graphqlHTTP from 'koa-graphql';
 import { GraphQLSchema } from 'graphql';
 import Knex from 'knex';
 
-import { getResolverlessSchema } from './getResolverlessSchema/getResolverlessSchema';
-import { populateSchemaWithResolvers } from './populateSchemaWithResolvers/populateSchemaWithResolvers';
+import { makeResolverlessSchema } from './makeResolverlessSchema/makeResolverlessSchema';
+import { populateSchemaWithResolvers } from './populateSchemaResolvers/populateSchemaResolvers';
 import { generateDatabase } from './generateDatabase/generateDatabase';
-import { insertRootQueryObject } from './insertRootQueryObject';
+import { insertRootQueryObject } from './generateDatabase/insertRootQueryObject';
 
 export async function createApp({
     config,
@@ -20,7 +20,7 @@ export async function createApp({
 }): Promise<{ app: Koa<Koa.DefaultState, Koa.DefaultContext>; knex: Knex }> {
     let sourceSchema: GraphQLSchema;
     try {
-        sourceSchema = getResolverlessSchema(typeDefs);
+        sourceSchema = makeResolverlessSchema(typeDefs);
     } catch (e) {
         console.error('Your schema has errors: ');
         throw e;

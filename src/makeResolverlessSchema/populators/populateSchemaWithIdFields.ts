@@ -1,6 +1,6 @@
 import { mergeSchemas } from '@graphql-tools/merge';
 import { GraphQLList, GraphQLObjectType, GraphQLSchema, isListType, isObjectType } from 'graphql';
-import { NO_TABLE } from '../directives';
+import { NO_CHILD_TO_PARENT_LINK, PARENTS_LIST } from '../../directives/directives';
 
 export function populateSchemaWithIdFields(schema: GraphQLSchema): GraphQLSchema {
     const schemaTypeMap = schema.getTypeMap();
@@ -15,8 +15,12 @@ export function populateSchemaWithIdFields(schema: GraphQLSchema): GraphQLSchema
         listFields.forEach((field) => {
             const fieldType = field.type as GraphQLList<GraphQLObjectType>;
             const ofTypeName = fieldType.ofType.name;
-            if (!field.astNode?.directives?.some((d) => d.name.value === NO_TABLE)) {
-                typeDefs += `type ${ofTypeName} { ${type.name}_${field.name}_${type.name}_list: [${type.name}] @${NO_TABLE} } `;
+            if (
+                !field.astNode?.directives?.some((d) =>
+                    ([NO_CHILD_TO_PARENT_LINK, PARENTS_LIST] as string[]).includes(d.name.value)
+                )
+            ) {
+                typeDefs += `type ${ofTypeName} { ${type.name}_${field.name}_${type.name}_list: [${type.name}] @${PARENTS_LIST}(parentField: "${field.name}") } `;
             }
         });
 

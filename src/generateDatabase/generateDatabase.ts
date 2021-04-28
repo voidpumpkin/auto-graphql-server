@@ -4,8 +4,8 @@ import Knex from 'knex';
 import { GraphQLObjectType, GraphQLSchema, isObjectType } from 'graphql';
 
 import { generateTables } from './generateTables';
-import { log } from '../logger';
-import { NO_TABLE } from '../directives';
+import { log } from '../utils/logger';
+import { NO_TABLE } from '../directives/directives';
 
 export async function generateDatabase({
     sourceSchema,
@@ -46,7 +46,7 @@ export async function generateDatabase({
     const doesDbAlreadyExist = await knex.schema.hasTable(objectTypes[0].name);
 
     if (doesDbAlreadyExist && (config.skipDbCreationIfExists ?? true)) {
-        (await import('../logger')).log(
+        (await import('../utils/logger')).log(
             '💀💀💀',
             '\x1b[1m\x1b[31mSKIPPED TABLE CREATION, DB ALREADY EXISTS'
         );

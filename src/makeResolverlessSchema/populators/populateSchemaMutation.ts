@@ -1,7 +1,7 @@
 import { GraphQLSchema, isEqualType, isObjectType, GraphQLObjectType } from 'graphql';
-import { getMutationStrings, defaultInputArg } from './getMutationStrings';
+import { getMutationStrings, defaultInputArg } from './utils/getMutationStrings';
 import { mergeSchemas } from '@graphql-tools/merge';
-import { NO_TABLE } from '../directives';
+import { NO_TABLE } from '../../directives/directives';
 
 export function populateSchemaMutation(schema: GraphQLSchema): GraphQLSchema {
     const schemaTypeMap = schema.getTypeMap();
