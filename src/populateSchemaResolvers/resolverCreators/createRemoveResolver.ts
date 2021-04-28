@@ -12,7 +12,6 @@ export function createRemoveResolver(
         const filter = args?.filter || {};
         const knexResult = await knex(returnTypeName).select().where(filter);
         const results = knexResult.map((r: all) => r?.id);
-        await knex(returnTypeName).where(filter).delete();
         await Promise.all(
             Object.values(listFields).map(async ({ astNode, name }) => {
                 if (hasDirectives(astNode, [NO_TABLE, PARENTS_LIST])) {
@@ -22,6 +21,7 @@ export function createRemoveResolver(
                 await knex(listTableName).whereIn(`${returnTypeName}_id`, results).delete();
             })
         );
+        await knex(returnTypeName).where(filter).delete();
         return results;
     };
 }
