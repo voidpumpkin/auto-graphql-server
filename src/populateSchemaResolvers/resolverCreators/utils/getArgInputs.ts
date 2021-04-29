@@ -11,7 +11,7 @@ export function getArgInputs(
 
     for (const inputName in argObject) {
         if (listFields.hasOwnProperty(inputName)) {
-            listInputs[inputName] = argObject[inputName];
+            listInputs[inputName] = argObject[inputName] || [];
         } else if (nonListFields.hasOwnProperty(inputName)) {
             nonListInputs[inputName] = argObject[inputName];
         }

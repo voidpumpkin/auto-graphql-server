@@ -10,9 +10,7 @@
     async function deleteTask(_e) {
         await queryGraphql(
             `mutation { 
-    removeTask(filter: {id: "${task.id}"}) {
-        id
-    }
+    removeTask(filter: {id: "${task.id}"})
 }`
         );
 

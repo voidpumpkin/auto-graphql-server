@@ -9,7 +9,9 @@
     export let marginLeft = 'unset';
 
     async function addTask(_e, { name }) {
-        const parentField = isParentProject ? 'Project_tasks_id' : 'Task_subTasks_id';
+        const parentField = isParentProject
+            ? 'Project_tasks_Project_list'
+            : 'Task_subTasks_Task_list';
         await queryGraphql(
             `mutation { 
     addTask(input: {name: "${name}" ${parentField}: "${parentId}" } ) {

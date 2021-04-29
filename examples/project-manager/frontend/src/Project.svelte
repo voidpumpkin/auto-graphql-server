@@ -18,7 +18,7 @@
     </div>
     {#if tasks}
         {#each tasks as task}
-            <Task {...task} {refetch} />
+            <Task {...task} {refetch} isParentProject={true} />
         {/each}
     {/if}
 </div>

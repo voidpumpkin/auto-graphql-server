@@ -52,12 +52,7 @@ export function getMutationResolvers(sourceSchema: GraphQLSchema, knex: Knex): I
         if (fieldName.startsWith('add')) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
-            resolvers.Mutation[fieldName] = createAddResolver(
-                listFields,
-                nonListFields,
-                knex,
-                queryTypeName
-            );
+            resolvers.Mutation[fieldName] = createAddResolver(listFields, nonListFields, knex);
         } else if (fieldName.startsWith('update')) {
             const isQueryType = returnTypeName === queryType.name;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment

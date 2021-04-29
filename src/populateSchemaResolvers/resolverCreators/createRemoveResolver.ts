@@ -2,8 +2,10 @@ import Knex from 'knex';
 import { NO_TABLE } from '../../directives/directives';
 import { hasDirectives } from '../../directives/hasDirectives';
 import { IFieldResolver } from 'graphql-tools';
-import { getParentFieldValue } from '../../directives/getParentFieldValue';
 import { getParentListDirective } from '../../directives/getParentListDirective';
+import { syncAsyncForEatch } from '../../utils/syncAsyncForEatch';
+import { createParentListData } from './utils/createParentListData';
+import { createObjectListData } from './utils/createObjectListData';
 
 export function createRemoveResolver(
     knex: Knex,
@@ -14,23 +16,24 @@ export function createRemoveResolver(
         const filter = args?.filter || {};
         const knexResult = await knex(returnTypeName).select().where(filter);
         const results = knexResult.map((r: all) => r?.id);
-        await Promise.all(
-            Object.values(listFields).map(async (field) => {
-                const parentDirective = getParentListDirective(field.astNode);
-                if (parentDirective) {
-                    const parentFieldValue = getParentFieldValue(parentDirective);
-                    const listTableName = `__${field.type.ofType.name}_${parentFieldValue}_list`;
-                    const foreignKeyName = `${field.type.ofType.name}_${parentFieldValue}_${returnTypeName}_id`;
-                    await knex(listTableName).whereIn(foreignKeyName, results).delete();
-                    return;
-                }
-                if (hasDirectives(field.astNode, [NO_TABLE])) {
-                    return;
-                }
-                const listTableName = `__${returnTypeName}_${field.name}_list`;
-                await knex(listTableName).whereIn(`${returnTypeName}_id`, results).delete();
-            })
-        );
+        await syncAsyncForEatch(Object.values(listFields), async (field) => {
+            const parentListDirective = getParentListDirective(field.astNode);
+            if (parentListDirective) {
+                const parentListData = createParentListData(
+                    parentListDirective,
+                    field.type.ofType.name,
+                    returnTypeName
+                );
+                await knex(parentListData.tableName)
+                    .whereIn(parentListData.childKeyOrValueName, results)
+                    .delete();
+            } else if (!hasDirectives(field.astNode, [NO_TABLE])) {
+                const objectListData = createObjectListData(returnTypeName, field.name, '');
+                await knex(objectListData.tableName)
+                    .whereIn(objectListData.parentKeyName, results)
+                    .delete();
+            }
+        });
         await knex(returnTypeName).where(filter).delete();
         return results;
     };

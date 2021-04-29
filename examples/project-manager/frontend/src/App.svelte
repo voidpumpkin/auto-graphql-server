@@ -4,18 +4,21 @@
     import ProjectsContainer from './ProjectsContainer.svelte';
     let projects = [];
     async function refetch() {
-        const response = await queryGraphql(`query {
+        const response = await queryGraphql(
+            `query {
     projects {
         id
         name
         tasks {
             id
             name
-            Task_subTasks_id
-            Project_tasks_id
+            Project_tasks_Project_list {
+                id
+            }
         }
     }
-}`);
+}`
+        );
         projects = response?.data?.projects || [];
     }
     onMount(refetch);

@@ -13,7 +13,7 @@
         }
         await queryGraphql(
             `mutation { 
-    updateTask(
+    updateProject(
         filter: {id: "${project.id}"}
         input: {name: "${name}"}) {
         id

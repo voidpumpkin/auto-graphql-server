@@ -9,7 +9,7 @@
     async function addProject(_e, { name }) {
         await queryGraphql(
             `mutation { 
-    addProject(input: {name: "${name}" Query_projects_id: "1" } ) {
+    addProject(input: {name: "${name}" Query_projects_Query_list: ["1"] } ) {
         id
     }
 }`

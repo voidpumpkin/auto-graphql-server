@@ -1,5 +1,5 @@
 export default async function queryGraphql(query) {
-    console.log('%c' + query, 'font-weight: bold; font-size: 2em; font-family: monospace;');
+    console.debug('%c' + query, 'font-weight: bold; font-size: 2em; font-family: monospace;');
     const response = await fetch('/graphql', {
         method: 'POST',
         headers: {

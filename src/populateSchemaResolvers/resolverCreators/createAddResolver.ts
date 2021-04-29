@@ -1,16 +1,18 @@
-import { isScalarType, isObjectType, DirectiveNode, GraphQLObjectType } from 'graphql';
+import { isScalarType, isObjectType } from 'graphql';
 import Knex from 'knex';
 import { getArgInputs } from './utils/getArgInputs';
-import { createObjectTypeFieldResolver } from './createObjectTypeFieldResolver';
 import { IFieldResolver } from 'graphql-tools';
-import { getParentFieldValue } from '../../directives/getParentFieldValue';
 import { getParentListDirective } from '../../directives/getParentListDirective';
+import { createParentListData } from './utils/createParentListData';
+import { insertListValue } from './utils/insertListValue';
+import { createObjectListData } from './utils/createObjectListData';
+import { createScalarListData } from './utils/createScalarListData';
+import { syncAsyncForEatch } from '../../utils/syncAsyncForEatch';
 
 export function createAddResolver(
     listFields: GraphQLListTypeFieldMap,
     nonListFields: GraphQLNotListTypeFieldMap,
-    knex: Knex,
-    queryTypeName: string
+    knex: Knex
 ): IFieldResolver<all, all> {
     return async (_, args, __, info) => {
         const returnType = info.returnType;
@@ -24,100 +26,31 @@ export function createAddResolver(
             await knex(returnType.name).returning('id').insert(nonListInputs)
         )[0];
 
-        await Promise.all(
-            Object.entries(listInputs).map(async ([inputName, valueList]) =>
-                Promise.all(
-                    valueList.map(async (value: all) => {
-                        const parentListDirective = getParentListDirective(
-                            listFields[inputName].astNode
-                        );
-                        const parentTypeName: string = listFields[inputName].type.ofType.name;
-                        if (isScalarType(listFields[inputName].type.ofType)) {
-                            await insertScalarListValue(
-                                knex,
-                                value,
-                                returnType,
-                                inputName,
-                                insertResultId
-                            );
-                        } else if (parentListDirective) {
-                            await insertParentListValues(
-                                parentListDirective,
-                                parentTypeName,
-                                returnType,
-                                knex,
-                                insertResultId,
-                                value
-                            );
-                        } else if (isObjectType(listFields[inputName].type.ofType)) {
-                            await insertObjectListValues(
-                                knex,
-                                returnType,
-                                inputName,
-                                parentTypeName,
-                                value,
-                                insertResultId
-                            );
-                        }
-                    })
-                )
-            )
-        );
-        const returnResolver = createObjectTypeFieldResolver(
-            knex,
-            { type: returnType } as GraphQLObjectTypeField,
-            queryTypeName,
-            insertResultId
-        );
-        return await returnResolver({}, undefined, undefined, info);
+        await syncAsyncForEatch(Object.entries(listInputs), async ([inputName, valueList]) => {
+            await syncAsyncForEatch<all>(valueList, async (value) => {
+                const parentListDirective = getParentListDirective(listFields[inputName].astNode);
+                const parentTypeName: string = listFields[inputName].type.ofType.name;
+                if (isScalarType(listFields[inputName].type.ofType)) {
+                    const scalarListData = createScalarListData(returnType.name, inputName);
+                    await insertListValue(scalarListData, knex, value, insertResultId);
+                } else if (parentListDirective) {
+                    const parentListData = createParentListData(
+                        parentListDirective,
+                        parentTypeName,
+                        returnType.name
+                    );
+                    await insertListValue(parentListData, knex, insertResultId, value);
+                } else if (isObjectType(listFields[inputName].type.ofType)) {
+                    const objectListData = createObjectListData(
+                        returnType.name,
+                        inputName,
+                        parentTypeName
+                    );
+                    await insertListValue(objectListData, knex, value, insertResultId);
+                }
+            });
+        });
+
+        return await knex(returnType.name).select().where({ id: insertResultId }).first();
     };
-}
-
-async function insertObjectListValues(
-    knex: Knex,
-    returnType: GraphQLObjectType,
-    inputName: string,
-    parentTypeName: string,
-    value: string,
-    insertResultId: number
-) {
-    const listTableName = `__${returnType.name}_${inputName}_list`;
-    await knex(listTableName).insert({
-        [`${returnType.name}_${inputName}_${parentTypeName}_id`]: value,
-        [`${returnType.name}_id`]: insertResultId,
-    });
-}
-
-async function insertScalarListValue(
-    knex: Knex,
-
-    value: all,
-    returnType: GraphQLObjectType,
-    inputName: string,
-    insertResultId: number
-) {
-    const listTableName = `__${returnType.name}_${inputName}_list`;
-    await knex(listTableName).insert({
-        value,
-        [`${returnType.name}_id`]: insertResultId,
-    });
-}
-
-async function insertParentListValues(
-    parentListDirective: DirectiveNode,
-    parentTypeName: string,
-    returnType: GraphQLObjectType,
-    knex: Knex,
-    childId: number,
-    parentId: string
-) {
-    const parentFieldArgValue = getParentFieldValue(parentListDirective);
-    const parentFieldListTableName = `__${parentTypeName}_${parentFieldArgValue}_list`;
-    const parentFieldListChildForeignKey = `${parentTypeName}_${parentFieldArgValue}_${returnType.name}_id`;
-    const parentForeignKey = `${parentTypeName}_id`;
-
-    await knex(parentFieldListTableName).insert({
-        [parentFieldListChildForeignKey]: childId,
-        [parentForeignKey]: parentId,
-    });
 }

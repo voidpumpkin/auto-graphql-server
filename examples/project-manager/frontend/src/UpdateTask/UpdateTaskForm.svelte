@@ -1,12 +1,15 @@
 <script>
     export let onSubmit;
     export let name;
-    export let Project_tasks_id;
-    export let Task_subTasks_id;
-    let isParentProject = !Task_subTasks_id;
-    $: parentId = isParentProject ? Project_tasks_id : Task_subTasks_id;
+    export let Project_tasks_Project_list;
+    export let Task_subTasks_Task_list;
+    export let isParentProject;
+    let isSubtask = !isParentProject;
+    let parentIds = Project_tasks_Project_list?.length
+        ? Project_tasks_Project_list.map((e) => e.id).join()
+        : Task_subTasks_Task_list.map((e) => e.id).join();
     function handleSubmit(e) {
-        onSubmit(e, { name, parentId, isParentProject });
+        onSubmit(e, { name, parentIds: parentIds.split(','), isParentProject, isSubtask });
     }
 </script>
 
@@ -16,21 +19,16 @@
         <input type="text" name="name" id="name" bind:value={name} />
     </div>
     <div class="form-example">
-        <label for="isParentProject">Yra po-uždavinys: </label>
-        <input
-            type="checkbox"
-            name="isParentProject"
-            id="isParentProject"
-            bind:checked={isParentProject}
-        />
+        <label for="isSubtask">Yra po-uždavinys: </label>
+        <input type="checkbox" name="isSubtask" id="isSubtask" bind:checked={isSubtask} />
     </div>
     <div class="form-example">
-        {#if isParentProject}
-            <label for="parentId">Projekto id: </label>
+        {#if isSubtask}
+            <label for="parentId">Tėvinių uždavinių id: </label>
         {:else}
-            <label for="parentId">Tėvinio uždavinio id: </label>
+            <label for="parentId">Projekto id: </label>
         {/if}
-        <input type="number" name="parentId" id="parentId" bind:value={parentId} />
+        <input type="text" name="parentId" id="parentId" bind:value={parentIds} />
     </div>
     <div class="form-example">
         <input type="submit" value="Saugoti" />

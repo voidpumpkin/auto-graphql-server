@@ -1,8 +1,14 @@
-import { isScalarType } from 'graphql';
+import { isScalarType, DirectiveNode } from 'graphql';
 import Knex from 'knex';
 import { getArgInputs } from './utils/getArgInputs';
 import { createModifyRootObject } from './utils/createModifyRootObject';
 import { IFieldResolver } from 'graphql-tools';
+import { getParentListDirective } from '../../directives/getParentListDirective';
+import { syncAsyncForEatch } from '../../utils/syncAsyncForEatch';
+import { createParentListData } from './utils/createParentListData';
+import { insertListValue } from './utils/insertListValue';
+import { createObjectListData } from './utils/createObjectListData';
+import { createScalarListData } from './utils/createScalarListData';
 
 export function createUpdateResolver(
     queryTypeName: string,
@@ -33,25 +39,101 @@ export function createUpdateResolver(
         if (Object.keys(nonListInputs).length) {
             await knex(returnTypeName).update(nonListInputs).whereIn('id', updatingRowIds);
         }
-        await Promise.all(
-            Object.entries(listInputs).map(async ([inputName, valueList]) => {
-                const tableName = `__${returnTypeName}_${inputName}_list`;
-                const relationshipName = `${returnTypeName}_id`;
-                const valueColumnName = isScalarType(listFields[inputName].type.ofType)
-                    ? 'value'
-                    : `${returnTypeName}_${inputName}_${listFields[inputName].type.ofType.name}_id`;
-                await knex(tableName)
-                    .where({ [relationshipName]: root.id })
-                    .delete();
-                await valueList.reduce(async (prevPromise: Promise<void>, value: all) => {
-                    await prevPromise;
-                    await knex(tableName).insert({
-                        [valueColumnName]: value,
-                        [relationshipName]: root.id,
-                    });
-                }, Promise.resolve(undefined));
-            })
-        );
+
+        await syncAsyncForEatch(Object.entries(listInputs), async ([inputName, valueList]) => {
+            const parentListDirective = getParentListDirective(listFields[inputName].astNode);
+            const parentType = listFields[inputName].type.ofType;
+            if (parentListDirective) {
+                await updateParentListsValues(
+                    parentListDirective,
+                    parentType.name,
+                    returnTypeName,
+                    knex,
+                    updatingRowIds,
+                    valueList
+                );
+            } else if (isScalarType(parentType)) {
+                await updateScalarListsValues(
+                    returnTypeName,
+                    inputName,
+                    updatingRowIds,
+                    valueList,
+                    knex
+                );
+            } else {
+                await updateObjectListsValues(
+                    returnTypeName,
+                    inputName,
+                    parentType.name,
+                    knex,
+                    updatingRowIds,
+                    valueList
+                );
+            }
+        });
         return await knex(returnTypeName).select().where(queryWhere);
     };
+}
+
+async function updateScalarListsValues(
+    returnTypeName: string,
+    inputName: string,
+    updatingRowIds: all[],
+    valueList: all[],
+    knex: Knex
+) {
+    const listTableData = createScalarListData(returnTypeName, inputName);
+    await knex(listTableData.tableName)
+        .whereIn(listTableData.parentKeyName, updatingRowIds)
+        .delete();
+
+    await syncAsyncForEatch(updatingRowIds, async (updatingRowId) => {
+        await syncAsyncForEatch<all>(valueList, async (value) => {
+            await insertListValue(listTableData, knex, value, updatingRowId);
+        });
+    });
+}
+
+async function updateObjectListsValues(
+    returnTypeName: string,
+    inputName: string,
+    parentTypeName: string,
+    knex: Knex,
+    updatingRowIds: all[],
+    valueList: all[]
+) {
+    const listTableData = createObjectListData(returnTypeName, inputName, parentTypeName);
+    await knex(listTableData.tableName)
+        .whereIn(listTableData.parentKeyName, updatingRowIds)
+        .delete();
+
+    await syncAsyncForEatch(updatingRowIds, async (updatingRowId) => {
+        await syncAsyncForEatch<all>(valueList, async (childId) => {
+            await insertListValue(listTableData, knex, childId, updatingRowId);
+        });
+    });
+}
+
+async function updateParentListsValues(
+    parentListDirective: DirectiveNode,
+    parentTypeName: string,
+    returnTypeName: string,
+    knex: Knex,
+    updatingRowIds: all[],
+    valueList: all[]
+) {
+    const parentListData = createParentListData(
+        parentListDirective,
+        parentTypeName,
+        returnTypeName
+    );
+    await knex(parentListData.tableName)
+        .whereIn(parentListData.childKeyOrValueName, updatingRowIds)
+        .delete();
+
+    await syncAsyncForEatch(updatingRowIds, async (updatingRowId) => {
+        await syncAsyncForEatch<all>(valueList, async (parentId) => {
+            await insertListValue(parentListData, knex, updatingRowId, parentId);
+        });
+    });
 }

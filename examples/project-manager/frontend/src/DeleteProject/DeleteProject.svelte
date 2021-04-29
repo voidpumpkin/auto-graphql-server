@@ -10,9 +10,7 @@
     async function deleteProject(_e) {
         await queryGraphql(
             `mutation { 
-    removeProject(filter: {id: "${project.id}"}) {
-        id
-    }
+    removeProject(filter: {id: "${project.id}"})
 }`
         );
 

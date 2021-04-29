@@ -28,3 +28,9 @@ declare type GraphQLListTypeFieldMap = Record<string, GraphQLListTypeField>;
 
 declare type GraphQLObjectTypeField = { type: GraphQLObjectType } & Omit<GraphQLField, 'type'>;
 declare type GraphQLObjectTypeFieldMap = Record<string, GraphQLObjectTypeField>;
+
+declare type ListTableData = {
+    tableName: string;
+    childKeyOrValueName: string;
+    parentKeyName: string;
+};
