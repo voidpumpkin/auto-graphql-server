@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-all */
 import { GraphQLObjectType, GraphQLField, GraphQLInterfaceType } from 'graphql';
 
 export function recursivelyGetAllFields(

@@ -10,7 +10,7 @@ export function validateObjectTypesIdFields(schemaTypeMap: TypeMap): void {
             if (isScalarType(field.type)) {
                 if (field.name === 'id') {
                     throw Error(
-                        `In type ${objectName}, "${field.name}" field will be automaticly added, please remove it`
+                        `🤓 In type ${objectName}, "${field.name}" field will be automaticly added, please remove it`
                     );
                 }
             } else if (isListType(field.type)) {
@@ -19,7 +19,7 @@ export function validateObjectTypesIdFields(schemaTypeMap: TypeMap): void {
                         const foreignKeyFieldName = `${objectName}_${field.name}_id`;
                         if (ofTypeField.name === `${objectName}_${field.name}_id`) {
                             throw Error(
-                                `In type ${objectName}, "${foreignKeyFieldName}" field will be automaticly added, please remove it`
+                                `🤓 In type ${objectName}, "${foreignKeyFieldName}" field will be automaticly added, please remove it`
                             );
                         }
                     });
